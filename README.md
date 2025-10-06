@@ -8,13 +8,8 @@ Ver todos los eventos
 
 
 ## TAREAS JUANI
-Login
-Register
-Create event
-Load all events
-Load user specific events
-
-
-
-
-Evento
+Login = /login
+Register = /register
+Create event = /create/event
+Load all events = /events
+Join event = /events/join

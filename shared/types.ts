@@ -1,34 +1,90 @@
-interface Event {
+export interface Event {
     id: string
     title: string
     date: string
     description: string
+    description_extended: string
     location: string
     imagen_url: string
     price: number
-
+    is_paid: boolean
+    is_cancelled: boolean
 }
 
-interface EventUser {
+export interface EventUser {
     id: string
     id_user: string
     id_event: string
     
 }
 
-interface User {
+export interface User {
     id: string
     username: string
     nickname: string
     full_name: string
+    last_name: string
+    email: string
     DNI: string
     password: string
     balance: number
     tickets_bought: number // default(0)
     confirmed_asistances: number // default (0)
-    
 }
 
+export interface LoginRequest {
+    username: string
+    password: string
+}
+
+export interface LoginResponse {
+    success: boolean
+    user?: User
+    token?: string
+    message?: string
+}
+
+export interface RegisterRequest {
+    username: string
+    nickname: string
+    full_name: string
+    last_name: string
+    email: string
+    DNI: string
+    password: string
+}
+
+export interface RegisterResponse {
+    success: boolean
+    user?: User
+    message?: string
+}
+
+export interface AllEventsRequest {
+    page?: number
+    limit?: number
+    search?: string
+    category?: string
+}
+
+export interface AllEventsResponse {
+    success: boolean
+    events: Event[]
+    total: number
+    page: number
+    totalPages: number
+}
+
+export interface JoinEventRequest {
+    eventId: string
+    userId: string
+}
+
+export interface JoinEventResponse {
+    success: boolean
+    eventUser?: EventUser
+    message?: string
+}
 
 /* nombre de usuario, su nombre de pila,
 apellido, DNI, email, contraseña y saldo disponible. Así como también la cantidad de
