@@ -7,61 +7,90 @@ interface EventCardProps {
 }
 
 export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const dateObj = new Date(event.date);
 
-  const formatPrice = (price: number, isPaid: boolean) => {
-    if (!isPaid) return 'Free';
-    return `$${price.toFixed(2)}`;
-  };
+  const fullDate = dateObj.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const shortDate = dateObj.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+  const shortTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+  const priceLabel = !event.is_paid ? 'Free' : `$${event.price.toFixed(0)}`;
+  const isFree = !event.is_paid;
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-      <div className="relative">
-        <img 
-          src={event.imagen_url || '/placeholder-event.jpg'} 
+    <div
+      className={`group relative rounded-xl border border-border bg-surface shadow-sm hover:shadow-md hover:border-border transition-all duration-300 overflow-hidden flex flex-col ${event.is_cancelled ? 'opacity-70 grayscale' : ''}`}
+    >
+      {/* Media */}
+      <div className="relative h-44 overflow-hidden">
+        <img
+          src={event.imagen_url || '/placeholder-event.jpg'}
           alt={event.title}
-          className="w-full h-48 object-cover"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+          loading="lazy"
         />
+  <div className="absolute inset-0 bg-black/30 mix-blend-multiply pointer-events-none" />
+
+        {/* Top badges */}
+        <div className="absolute top-2 left-2 flex flex-wrap gap-2">
+          <span className="px-2 py-1 rounded-md text-[11px] font-medium bg-surface-alt shadow-sm u-text-soft border border-border">
+            {shortDate} • {shortTime}
+          </span>
+          <span
+            className={`px-2 py-1 rounded-md text-[11px] font-semibold tracking-wide shadow-sm border backdrop-blur
+              ${isFree ? 'bg-success u-text-inverse border-success-hover/70' : 'bg-primary u-text-inverse border-primary-hover/70'}`}
+          >
+            {priceLabel}
+          </span>
+        </div>
+
         {event.is_cancelled && (
-          <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-semibold">
+          <div className="absolute top-2 right-2 px-2 py-1 rounded-md text-[11px] font-semibold bg-red-600 u-text-inverse shadow border border-red-500/70">
             Cancelled
           </div>
         )}
-        <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
-          {formatPrice(event.price, event.is_paid)}
+
+        {/* Title overlay (optional) */}
+        <div className="absolute bottom-2 left-2 right-2">
+          <h3 className="u-text-inverse text-lg font-semibold drop-shadow-sm line-clamp-1 pr-8">
+            {event.title}
+          </h3>
         </div>
       </div>
-      
-      <div className="p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h3>
-        <p className="text-gray-600 text-sm mb-3">{formatDate(event.date)}</p>
-        <p className="text-gray-700 mb-3 line-clamp-2">{event.description}</p>
-        
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-          <span className="flex items-center">
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            {event.location}
-          </span>
+
+      {/* Body */}
+  <div className="p-5 flex flex-col flex-1 bg-surface">
+  <p className="text-xs u-text-muted mb-1">{fullDate}</p>
+        <p className="u-text-muted text-sm line-clamp-2 mb-4 flex-1 leading-relaxed">{event.description}</p>
+
+        <div className="flex items-start gap-2 text-xs u-text-muted mb-4">
+          <svg className="w-4 h-4 mt-[2px] u-text-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span className="line-clamp-1" title={event.location}>{event.location}</span>
         </div>
-        
+
         {!event.is_cancelled && onJoinEvent && (
-          <button 
+          <button
             onClick={() => onJoinEvent(event.id)}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium"
+            className={`w-full mt-auto inline-flex justify-center items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold tracking-wide shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 transition-all
+              ${isFree ? 'bg-success hover:bg-success-hover u-text-inverse focus-visible:ring-success' : 'bg-primary hover:bg-primary-hover u-text-inverse focus-visible:ring-primary'}`}
           >
-            Join Event
+            {isFree ? "0$" : priceLabel}
           </button>
+        )}
+        {event.is_cancelled && (
+          <div className="mt-auto text-xs font-medium u-text-danger">This event was cancelled</div>
         )}
       </div>
     </div>

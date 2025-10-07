@@ -21,12 +21,12 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
+    <div className="p-5 md:p-6 rounded-lg border border-border bg-surface shadow-sm mb-8">
       <div className="flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 w-full">
           <div className="relative">
             <svg 
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" 
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 u-text-subtle w-5 h-5" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
               placeholder="Search events..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 rounded-md border border-border bg-surface-alt focus:ring-2 focus:ring-primary/50 focus:border-primary placeholder:u-text-subtle u-text-base"
             />
           </div>
         </div>
@@ -52,7 +52,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
           <select
             value={selectedFilter}
             onChange={(e) => onFilterChange(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full md:w-auto px-3 py-2 rounded-md border border-border bg-surface-alt focus:ring-2 focus:ring-primary/50 focus:border-primary u-text-base"
           >
             {filters.map((filter) => (
               <option key={filter.value} value={filter.value}>
