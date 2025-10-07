@@ -1,13 +1,16 @@
-import express from 'express'
+import { db } from '../db/db'
 
-const router = express.Router()
-
-router.get('/', (req, res, next) => {
-
-    try {
-
-    } catch(err) {
-        next(err)
+export const getAllEvents = async () => {
+  const events = await db.event.findMany({
+    select: {
+        id: true,
+        title: true,
+        description: true,
+        date: true,
+        location: true,
+        image_url: true,
     }
+  })
 
-})
+  return events
+}

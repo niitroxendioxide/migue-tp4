@@ -26,7 +26,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       <div className="relative">
         <img 
-          src={event.imagen_url || '/placeholder-event.jpg'} 
+          src={event.image_url || '/placeholder-event.jpg'} 
           alt={event.title}
           className="w-full h-48 object-cover"
         />

@@ -3,12 +3,12 @@ import express from 'express'
 import { PrismaClient } from '@prisma/client'
 
 const app = express()
-const prisma = new PrismaClient()
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000')
+app.get('/health', (req, res) => {
+  res.send('Hello World!')
 })
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+// setup the app
+app.listen(3000, () => {
+  console.log('Server running on port 3000')
 })

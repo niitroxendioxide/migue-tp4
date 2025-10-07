@@ -28,7 +28,7 @@ model Event {
     date        DateTime @default(now())
     description String
     location    String
-    imagen_url  String
+    image_url  String
     price       Int
 
     attendees   User[]   @relation("EventAttendees")
