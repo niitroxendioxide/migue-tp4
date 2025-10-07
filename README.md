@@ -10,6 +10,8 @@ Ver todos los eventos
 ## TAREAS JUANI
 Login = /login
 Register = /register
-Create event = /create/event
+Home page = /home
+Create event = /events/create
 Load all events = /events
 Join event = /events/join
+Specific event = /events/:id

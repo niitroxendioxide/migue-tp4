@@ -13,7 +13,7 @@ const mockEvents: Event[] = [
     description: 'Annual technology conference featuring the latest innovations in software development.',
     description_extended: 'Join us for a full day of presentations, workshops, and networking opportunities with industry leaders. Learn about cutting-edge technologies, best practices, and future trends that will shape the tech industry.',
     location: 'San Francisco Convention Center',
-    imagen_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     price: 299.99,
     is_paid: true,
     is_cancelled: false
@@ -25,7 +25,7 @@ const mockEvents: Event[] = [
     description: 'Local artists showcase their latest works in this community-driven art exhibition.',
     description_extended: 'Discover the vibrant local art scene with works from over 50 community artists. Enjoy wine, music, and the opportunity to purchase original pieces.',
     location: 'Downtown Art Gallery',
-    imagen_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     price: 0,
     is_paid: false,
     is_cancelled: false
@@ -37,7 +37,7 @@ const mockEvents: Event[] = [
     description: 'Three-day music festival featuring international and local artists.',
     description_extended: 'Experience three days of non-stop music across multiple stages. From rock to electronic, folk to hip-hop, there\'s something for every music lover.',
     location: 'Golden Gate Park',
-    imagen_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     price: 150.00,
     is_paid: true,
     is_cancelled: false
@@ -49,7 +49,7 @@ const mockEvents: Event[] = [
     description: 'Connect with entrepreneurs, investors, and innovators in the startup ecosystem.',
     description_extended: 'An evening dedicated to fostering connections in the startup community. Meet potential co-founders, investors, and collaborators while enjoying drinks and appetizers.',
     location: 'Innovation Hub',
-    imagen_url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     price: 25.00,
     is_paid: true,
     is_cancelled: false
@@ -61,7 +61,7 @@ const mockEvents: Event[] = [
     description: 'Learn modern web development techniques in this hands-on workshop.',
     description_extended: 'Perfect for beginners and intermediate developers. We\'ll cover React, TypeScript, and modern development tools. All materials and refreshments provided.',
     location: 'Tech Learning Center',
-    imagen_url: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     price: 0,
     is_paid: false,
     is_cancelled: false

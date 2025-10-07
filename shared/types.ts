@@ -5,7 +5,7 @@ export interface Event {
     description: string
     description_extended: string
     location: string
-    imagen_url: string
+    image_url: string
     price: number
     is_paid: boolean
     is_cancelled: boolean
