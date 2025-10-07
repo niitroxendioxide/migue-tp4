@@ -33,7 +33,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
       {/* Media */}
       <div className="relative h-44 overflow-hidden">
         <img
-          src={event.imagen_url || '/placeholder-event.jpg'}
+          src={event.image_url || '/placeholder-event.jpg'}
           alt={event.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
           loading="lazy"
@@ -83,7 +83,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
         {!event.is_cancelled && onJoinEvent && (
           <button
             onClick={() => onJoinEvent(event.id)}
-            className={`w-full mt-auto inline-flex justify-center items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold tracking-wide shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 transition-all
+            className={`cursor-pointer w-full mt-auto inline-flex justify-center items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold tracking-wide shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 transition-all
               ${isFree ? 'bg-success hover:bg-success-hover u-text-inverse focus-visible:ring-success' : 'bg-primary hover:bg-primary-hover u-text-inverse focus-visible:ring-primary'}`}
           >
             {isFree ? "0$" : priceLabel}

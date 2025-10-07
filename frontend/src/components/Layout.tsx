@@ -20,11 +20,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex justify-between items-center h-16">
             {/* Branding */}
             <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center u-text-inverse font-bold text-sm shadow-md">
-                M
-              </div>
+            
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight u-text-title flex items-center gap-1">
-                Migue<span className="text--primary">Eventos</span>
+                <span className='u-text-secondary'>Migue</span><span className="u-text-inverse">Eventos</span>
               </h1>
             </div>
 
@@ -46,10 +44,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-                <button className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full u-text-inverse bg-secondary shadow hover:shadow-md hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all">
+                <button className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full u-text-base bg-bg shadow hover:shadow-md hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all">
                 Sign In
               </button>
-                <button className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full u-text-inverse bg-primary shadow hover:shadow-md hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all">
+                <button className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full u-text-base bg-secondary shadow hover:shadow-md hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all">
                 Get Started
               </button>
             </div>
