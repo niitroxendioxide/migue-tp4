@@ -26,7 +26,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
         <div className="flex-1 w-full">
           <div className="relative">
             <svg 
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 u-text-subtle w-5 h-5" 
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-subtle w-5 h-5" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
               placeholder="Search events..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md border border-border bg-surface-alt focus:ring-2 focus:ring-primary/50 focus:border-primary placeholder:u-text-subtle u-text-base"
+              className="w-full pl-10 pr-4 py-2 rounded-md border border-border bg-surface-alt focus:ring-2 focus:ring-primary/50 focus:border-primary placeholder:text-text-subtle text-text-base"
             />
           </div>
         </div>
@@ -52,7 +52,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
           <select
             value={selectedFilter}
             onChange={(e) => onFilterChange(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 rounded-md border border-border bg-surface-alt focus:ring-2 focus:ring-primary/50 focus:border-primary u-text-base"
+            className="w-full md:w-auto px-3 py-2 rounded-md border border-border bg-surface-alt focus:ring-2 focus:ring-primary/50 focus:border-primary text-text-base"
           >
             {filters.map((filter) => (
               <option key={filter.value} value={filter.value}>
