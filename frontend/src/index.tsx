@@ -10,6 +10,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { WalletProvider } from './contexts/WalletContext';
 import { TicketsProvider } from './contexts/TicketsContext';
 import { EventsProvider } from './contexts/EventsContext';
+import { AttendanceProvider } from './contexts/AttendanceContext';
 import './index.css';
 
 const App: React.FC = () => {
@@ -56,9 +57,11 @@ root.render(
     <AuthProvider>
       <WalletProvider>
         <TicketsProvider>
-          <EventsProvider>
-            <App />
-          </EventsProvider>
+          <AttendanceProvider>
+            <EventsProvider>
+              <App />
+            </EventsProvider>
+          </AttendanceProvider>
         </TicketsProvider>
       </WalletProvider>
     </AuthProvider>

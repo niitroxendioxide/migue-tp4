@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useEvents } from '../contexts/EventsContext';
 import { useWallet } from '../contexts/WalletContext';
 import { useTickets } from '../contexts/TicketsContext';
+import { useAttendance } from '../contexts/AttendanceContext';
 import { Layout } from '../components/Layout';
 
 interface CancelEventModalProps {
@@ -61,6 +62,7 @@ const ProfilePage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const { balance } = useWallet();
   const { tickets } = useTickets();
+  const { attendances } = useAttendance();
   const { 
     createdEvents, 
     loading: eventsLoading, 
@@ -226,8 +228,8 @@ const ProfilePage: React.FC = () => {
                 <span className="text-green-600">🎟️</span>
               </div>
               <div>
-                <p className="text-text-muted text-sm">Tickets Comprados</p>
-                <p className="font-bold text-lg">{tickets.length}</p>
+                <p className="text-text-muted text-sm">Eventos/Tickets</p>
+                <p className="font-bold text-lg">{tickets.length + attendances.length}</p>
               </div>
             </div>
           </div>

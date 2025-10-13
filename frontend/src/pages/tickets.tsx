@@ -1,19 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTickets } from '../contexts/TicketsContext';
+import { useAttendance } from '../contexts/AttendanceContext';
 import { Layout } from '../components/Layout';
 
 const TicketsPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const { tickets, loading, getUpcomingEvents, getPastEvents, markAsAttended } = useTickets();
+  const { tickets, loading, getUpcomingEvents: getUpcomingTickets, getPastEvents: getPastTickets, markAsAttended } = useTickets();
+  const { 
+    attendances, 
+    loading: attendanceLoading, 
+    getUpcomingAttendances, 
+    getPastAttendances 
+  } = useAttendance();
+  
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
 
   if (!isAuthenticated) {
     window.location.hash = '/auth';
     return null;
   }
 
-  const upcomingEvents = getUpcomingEvents();
-  const pastEvents = getPastEvents();
+  // Combinar tickets pagos y asistencias gratuitas
+  const upcomingTickets = getUpcomingTickets();
+  const pastTickets = getPastTickets();
+  const upcomingAttendances = getUpcomingAttendances();
+  const pastAttendances = getPastAttendances();
+
+  // Combinar ambos tipos para mostrar
+  const allUpcoming = [
+    ...upcomingTickets.map(t => ({ ...t, type: 'paid' as const })),
+    ...upcomingAttendances.map(a => ({ 
+      ...a, 
+      type: 'free' as const,
+      price: 0,
+      transactionId: a.id,
+      purchaseDate: a.confirmedAt
+    }))
+  ].sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+
+  const allPast = [
+    ...pastTickets.map(t => ({ ...t, type: 'paid' as const })),
+    ...pastAttendances.map(a => ({ 
+      ...a, 
+      type: 'free' as const,
+      price: 0,
+      transactionId: a.id,
+      purchaseDate: a.confirmedAt,
+      attended: true // Las asistencias gratuitas se consideran "asistidas" por defecto
+    }))
+  ].sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -68,13 +104,17 @@ const TicketsPage: React.FC = () => {
                 🕒 {formatDate(ticket.eventDate)}
               </p>
               <p className="text-text-muted text-xs">
-                Comprado el: {formatPurchaseDate(ticket.purchaseDate)}
+                {ticket.type === 'paid' ? 'Comprado' : 'Confirmado'} el: {formatPurchaseDate(ticket.purchaseDate)}
               </p>
             </div>
 
             <div className="text-right">
-              <p className="font-bold text-lg text-primary mb-2">
-                ${ticket.price.toFixed(2)}
+              <p className="font-bold text-lg mb-2">
+                {ticket.type === 'paid' ? (
+                  <span className="text-primary">${ticket.price.toFixed(2)}</span>
+                ) : (
+                  <span className="text-green-600">🎟️ Gratis</span>
+                )}
               </p>
               
               {isUpcoming ? (
@@ -140,15 +180,15 @@ const TicketsPage: React.FC = () => {
         ) : (
           <>
             {/* Upcoming Events */}
-            {upcomingEvents.length > 0 && (
+            {allUpcoming.length > 0 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-text-dark">
-                  Próximos Eventos ({upcomingEvents.length})
+                  Próximos Eventos ({allUpcoming.length})
                 </h2>
                 <div className="space-y-3">
-                  {upcomingEvents.map((ticket) => (
+                  {allUpcoming.map((ticket: any) => (
                     <TicketCard 
-                      key={ticket.id} 
+                      key={ticket.id || ticket.transactionId} 
                       ticket={ticket} 
                       isUpcoming={true}
                     />
@@ -158,15 +198,15 @@ const TicketsPage: React.FC = () => {
             )}
 
             {/* Past Events */}
-            {pastEvents.length > 0 && (
+            {allPast.length > 0 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-text-dark">
-                  Eventos Pasados ({pastEvents.length})
+                  Eventos Pasados ({allPast.length})
                 </h2>
                 <div className="space-y-3">
-                  {pastEvents.map((ticket) => (
+                  {allPast.map((ticket: any) => (
                     <TicketCard 
-                      key={ticket.id} 
+                      key={ticket.id || ticket.transactionId} 
                       ticket={ticket} 
                       isUpcoming={false}
                     />
@@ -180,16 +220,16 @@ const TicketsPage: React.FC = () => {
               <h3 className="font-bold text-lg text-text-dark mb-4">Resumen</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div>
-                  <p className="text-2xl font-bold text-primary">{tickets.length}</p>
-                  <p className="text-sm text-text-muted">Total Tickets</p>
+                  <p className="text-2xl font-bold text-primary">{allUpcoming.length + allPast.length}</p>
+                  <p className="text-sm text-text-muted">Total Eventos</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-green-600">{upcomingEvents.length}</p>
+                  <p className="text-2xl font-bold text-green-600">{allUpcoming.length}</p>
                   <p className="text-sm text-text-muted">Próximos</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-blue-600">
-                    {pastEvents.filter(t => t.attended).length}
+                    {allPast.filter((t: any) => t.attended).length}
                   </p>
                   <p className="text-sm text-text-muted">Asistidos</p>
                 </div>
