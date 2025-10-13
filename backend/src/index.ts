@@ -1,14 +1,15 @@
-
 import express from 'express'
-import { PrismaClient } from '@prisma/client'
 import { eventsRouter } from './routers/events-router'
 import { errorHandlerMiddleware } from './middleware/errors'
+import { registerRouter } from './routers/register-router'
 
 const app = express()
 
+app.use(express.json())
+app.use("/api", registerRouter);
 app.use('/events', eventsRouter);
 app.get('/health', (req, res) => {
-  res.send('Hello World!')
+  res.send('OK\n')
 })
 
 app.use(errorHandlerMiddleware);
