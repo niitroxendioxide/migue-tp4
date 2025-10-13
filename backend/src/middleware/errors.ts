@@ -21,6 +21,12 @@ export class NotFoundError extends ServerError {
     }
 }
 
+export class ValidationError extends ServerError {
+    constructor(message: string = "Error when validating user tokens") {
+        super(message, 401);
+    }
+}
+
 
 export const errorHandlerMiddleware = (err: ServerError, res: any) => {
     if (err instanceof ServerError) {

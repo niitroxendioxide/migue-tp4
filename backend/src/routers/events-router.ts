@@ -14,3 +14,26 @@ eventsRouter.get('/', authMiddleware, async (req, res, next) => {
     }
 })
 
+eventsRouter.get('/create', authMiddleware, async (req, res, next) => {
+    try {
+        res.status(404)
+    } catch(error) {
+        next(error);
+    }
+})
+
+eventsRouter.get('/join', authMiddleware, async (req, res, next) => {
+    try {
+        res.status(404)
+    } catch(error) {
+        next(error);
+    }
+})  
+
+eventsRouter.get('/:id', authMiddleware, async (req, res, next) => {
+    try {
+        res.status(404)
+    } catch(error) {
+        next(error);
+    }
+})

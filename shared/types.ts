@@ -1,7 +1,7 @@
 export interface Event {
-    id: string
+    id: number
     title: string
-    date: string
+    date: Date
     description: string
     description_extended: string
     location: string
@@ -78,6 +78,24 @@ export interface JoinEventResponse {
     success: boolean
     eventUser?: EventUser
     message?: string
+}
+
+export interface CreateEventRequest {
+    title: string
+    description: string
+    date: string
+    location: string
+    image_url: string
+    price: number
+}
+
+export interface ChargeBalanceRequest {
+    amount: number
+}
+
+export interface ChargeBalanceResponse {
+    success: boolean
+    newBalance?: number
 }
 
 /* nombre de usuario, su nombre de pila,
