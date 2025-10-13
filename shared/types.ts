@@ -24,7 +24,7 @@ export interface User {
     email: string
     balance: number
     isAdmin: boolean
-    dni: string
+    dni: number
     full_name: string
 }
 
@@ -44,7 +44,7 @@ export interface RegisterRequest {
     username: string
     full_name: string
     email: string
-    DNI: string
+    DNI: number
     password: string
 }
 

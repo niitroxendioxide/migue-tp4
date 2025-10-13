@@ -5,10 +5,11 @@ import { registerRouter } from './routers/register-router'
 
 const app = express()
 
-app.use("/api", registerRouter)
+app.use(express.json())
+app.use("/api", registerRouter);
 app.use('/events', eventsRouter);
 app.get('/health', (req, res) => {
-  res.send('OK')
+  res.send('OK\n')
 })
 
 app.use(errorHandlerMiddleware);

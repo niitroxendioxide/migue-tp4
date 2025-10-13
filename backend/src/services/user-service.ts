@@ -108,6 +108,8 @@ export async function handleLoginRequest(p_Request: LoginRequest): Promise<Login
 }
 
 export async function handleRegisterRequest(p_Request: RegisterRequest): Promise<RegisterResponse> {
+    console.log(p_Request);
+    
     const existing_user = await getUserByEmail(p_Request.email);
 
     if (existing_user) {

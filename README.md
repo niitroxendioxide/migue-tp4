@@ -15,3 +15,6 @@ Create event = /events/create
 Load all events = /events
 Join event = /events/join
 Specific event = /events/:id
+Charge balance = payment/charge
+Add payment method = payment/add
+
