@@ -11,13 +11,16 @@ generator client {
 model User {
   id        Int      @id @default(autoincrement())
   name      String
+  full_name String
   email     String   @unique
+  dni       String   @unique
   password  String
   isAdmin   Boolean  @default(false)
   balance   Int      @default(0)
 
   events    Event[]  @relation("EventAttendees")
   payments  PaymentMethod[]
+  tokens    Tokens[]
 
   @@map("users")
 }
@@ -34,6 +37,17 @@ model Event {
     attendees   User[]   @relation("EventAttendees")
     
     @@map("events")
+}
+
+model Tokens {
+    id        Int      @id @default(autoincrement())
+    token     String   @unique
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now())
+    expiresAt DateTime
+  
+    @@map("tokens")
 }
 
 model PaymentMethod {

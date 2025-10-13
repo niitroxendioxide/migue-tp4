@@ -19,21 +19,17 @@ export interface EventUser {
 }
 
 export interface User {
-    id: string
-    username: string
-    nickname: string
-    full_name: string
-    last_name: string
+    id: number
+    name: string
     email: string
-    DNI: string
-    password: string
     balance: number
-    tickets_bought: number // default(0)
-    confirmed_asistances: number // default (0)
+    isAdmin: boolean
+    dni: string
+    full_name: string
 }
 
 export interface LoginRequest {
-    username: string
+    email: string
     password: string
 }
 
@@ -46,9 +42,7 @@ export interface LoginResponse {
 
 export interface RegisterRequest {
     username: string
-    nickname: string
     full_name: string
-    last_name: string
     email: string
     DNI: string
     password: string
@@ -57,7 +51,7 @@ export interface RegisterRequest {
 export interface RegisterResponse {
     success: boolean
     user?: User
-    message?: string
+    token?: string
 }
 
 export interface AllEventsRequest {

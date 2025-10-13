@@ -1,8 +1,30 @@
 
+export class ServerError extends Error {
+    public statusCode: number;
+    //public name: string?
 
-export const errorHandlerMiddleware = (err: any, res: any) => {
-    if (err instanceof Error) {
-        return res.status(500).json({ message: err.message })
+    constructor(message: string, statusCode: number = 500) {
+        super(message);
+        this.statusCode = statusCode;
+    }
+}
+
+export class BadRequestError extends ServerError {
+    constructor(message: string) {
+        super(message, 400);
+    }
+}
+
+export class NotFoundError extends ServerError {
+    constructor(message: string) {
+        super(message, 404);
+    }
+}
+
+
+export const errorHandlerMiddleware = (err: ServerError, res: any) => {
+    if (err instanceof ServerError) {
+        return res.status(err.statusCode).json({ message: err.message })
     }
 
     return res.status(500).json({ message: 'Internal server error' })
