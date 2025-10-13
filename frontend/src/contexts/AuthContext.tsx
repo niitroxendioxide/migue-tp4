@@ -5,12 +5,43 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  username?: string;
+  full_name?: string;
+  DNI?: number;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface RegisterRequest {
+  username: string;
+  full_name: string;
+  email: string;
+  DNI: number;
+  password: string;
+}
+
+interface RegisterResponse {
+  success: boolean;
+  user?: User;
+  token?: string;
+  message?: string;
+}
+
+interface LoginResponse {
+  success: boolean;
+  user?: User;
+  token?: string;
+  message?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (userData: User) => void;
+  login: (email: string, password: string) => Promise<LoginResponse>;
+  register: (userData: RegisterRequest) => Promise<RegisterResponse>;
   logout: () => void;
   loading: boolean;
 }
@@ -33,22 +64,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Simular verificación de autenticación al cargar la app
+  const API_BASE_URL = 'http://localhost:3000/api';
+
+  // Verificar autenticación al cargar la app
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Verificar si hay un token guardado en localStorage
         const token = localStorage.getItem('authToken');
         const userData = localStorage.getItem('userData');
         
         if (token && userData) {
-          // Simular validación del token (en producción harías una llamada al backend)
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // TODO: Validar token con el backend
           setUser(JSON.parse(userData));
         }
       } catch (error) {
         console.error('Error checking auth:', error);
-        // Limpiar datos inválidos
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
       } finally {
@@ -59,12 +89,87 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    // Simular token (en producción vendría del backend)
-    const fakeToken = `token_${userData.id}_${Date.now()}`;
-    localStorage.setItem('authToken', fakeToken);
-    localStorage.setItem('userData', JSON.stringify(userData));
+  const login = async (email: string, password: string): Promise<LoginResponse> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password } as LoginRequest),
+      });
+
+      const data: LoginResponse = await response.json();
+
+      if (data.success && data.user && data.token) {
+        // Guardar token y datos del usuario
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+        setUser(data.user);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      return {
+        success: false,
+        message: 'Error de conexión. Intenta nuevamente.',
+      };
+    }
+  };
+
+  const register = async (userData: RegisterRequest): Promise<RegisterResponse> => {
+    try {
+      console.log('Attempting register with:', userData);
+      console.log('API URL:', `${API_BASE_URL}/register`);
+      
+      const response = await fetch(`${API_BASE_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('Error response:', errorText);
+        return {
+          success: false,
+          message: `Error del servidor: ${response.status}`,
+        };
+      }
+
+      const data: RegisterResponse = await response.json();
+      console.log('Register response:', data);
+
+      if (data.success && data.user && data.token) {
+        // Auto-login después del registro
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+        setUser(data.user);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Register error:', error);
+      
+      // Verificar si es un error de red
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return {
+          success: false,
+          message: 'No se puede conectar al servidor. Verifica que el backend esté funcionando en http://localhost:3000',
+        };
+      }
+      
+      return {
+        success: false,
+        message: `Error de conexión: ${error instanceof Error ? error.message : 'Error desconocido'}`,
+      };
+    }
   };
 
   const logout = () => {
@@ -79,6 +184,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isAuthenticated: !!user,
     login,
+    register,
     logout,
     loading
   };

@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 type AuthMode = 'login' | 'register';
 
 export const AuthPage: React.FC = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
   
   // Redirigir si ya está autenticado
   React.useEffect(() => {
@@ -28,10 +28,13 @@ export const AuthPage: React.FC = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    firstName: '',
-    lastName: ''
+    username: '',
+    full_name: '',
+    DNI: ''
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
 
   // Escuchar cambios en la URL para actualizar el modo
   React.useEffect(() => {
@@ -44,9 +47,12 @@ export const AuthPage: React.FC = () => {
           email: '',
           password: '',
           confirmPassword: '',
-          firstName: '',
-          lastName: ''
+          username: '',
+          full_name: '',
+          DNI: ''
         });
+        setError('');
+        setSuccess('');
       }
     };
 
@@ -64,28 +70,49 @@ export const AuthPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+    setSuccess('');
     
     try {
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simular datos de usuario exitosos
-      const userData = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: formData.email,
-        firstName: formData.firstName || 'Usuario',
-        lastName: formData.lastName || 'Demo'
-      };
-      
-      // Hacer login del usuario
-      login(userData);
-      
-      // Redirigir a la página principal
-      window.location.hash = '#/';
-      
-      console.log('Auth successful:', authMode, userData);
+      if (authMode === 'login') {
+        // Login
+        const result = await login(formData.email, formData.password);
+        
+        if (result.success) {
+          setSuccess('¡Inicio de sesión exitoso!');
+          setTimeout(() => {
+            window.location.hash = '#/';
+          }, 1000);
+        } else {
+          setError(result.message || 'Error al iniciar sesión');
+        }
+      } else {
+        // Register
+        if (formData.password !== formData.confirmPassword) {
+          setError('Las contraseñas no coinciden');
+          return;
+        }
+
+        const result = await register({
+          username: formData.username,
+          full_name: formData.full_name,
+          email: formData.email,
+          DNI: parseInt(formData.DNI),
+          password: formData.password
+        });
+
+        if (result.success) {
+          setSuccess('¡Registro exitoso! Redirigiendo...');
+          setTimeout(() => {
+            window.location.hash = '#/';
+          }, 1000);
+        } else {
+          setError(result.message || 'Error al registrarse');
+        }
+      }
     } catch (error) {
       console.error('Auth error:', error);
+      setError('Error de conexión. Intenta nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -102,9 +129,12 @@ export const AuthPage: React.FC = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      firstName: '',
-      lastName: ''
+      username: '',
+      full_name: '',
+      DNI: ''
     });
+    setError('');
+    setSuccess('');
   };
 
   return (
@@ -128,40 +158,55 @@ export const AuthPage: React.FC = () => {
           <div className="bg-surface border border-border rounded-lg shadow-sm p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               
-              {/* Registro: Nombres */}
+              {/* Registro: Campos adicionales */}
               {authMode === 'register' && (
-                <div className="grid grid-cols-2 gap-4">
+                <>
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-text-base mb-2">
-                      Nombre
+                    <label htmlFor="username" className="block text-sm font-medium text-text-base mb-2">
+                      Nombre de Usuario
                     </label>
                     <input
-                      id="firstName"
-                      name="firstName"
+                      id="username"
+                      name="username"
                       type="text"
                       required
-                      value={formData.firstName}
+                      value={formData.username}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-border rounded-md bg-surface-alt text-text-base placeholder:text-text-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                      placeholder="Tu nombre"
+                      placeholder="Tu nombre de usuario"
                     />
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-text-base mb-2">
-                      Apellido
+                    <label htmlFor="full_name" className="block text-sm font-medium text-text-base mb-2">
+                      Nombre Completo
                     </label>
                     <input
-                      id="lastName"
-                      name="lastName"
+                      id="full_name"
+                      name="full_name"
                       type="text"
                       required
-                      value={formData.lastName}
+                      value={formData.full_name}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-border rounded-md bg-surface-alt text-text-base placeholder:text-text-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                      placeholder="Tu apellido"
+                      placeholder="Tu nombre completo"
                     />
                   </div>
-                </div>
+                  <div>
+                    <label htmlFor="DNI" className="block text-sm font-medium text-text-base mb-2">
+                      DNI
+                    </label>
+                    <input
+                      id="DNI"
+                      name="DNI"
+                      type="number"
+                      required
+                      value={formData.DNI}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-border rounded-md bg-surface-alt text-text-base placeholder:text-text-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                      placeholder="Tu DNI"
+                    />
+                  </div>
+                </>
               )}
 
               {/* Email */}
@@ -236,6 +281,19 @@ export const AuthPage: React.FC = () => {
                       ¿Olvidaste tu contraseña?
                     </a>
                   </div>
+                </div>
+              )}
+
+              {/* Mensajes de error y éxito */}
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                  {success}
                 </div>
               )}
 

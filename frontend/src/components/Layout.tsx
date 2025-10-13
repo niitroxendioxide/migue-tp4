@@ -84,7 +84,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <span className="font-medium">${balance.toFixed(2)}</span>
                   </a>
                   <span className="text-sm text-text-inverse hidden sm:block">
-                    Hola, {user?.firstName}
+                    Hola, {user?.firstName || user?.username || user?.full_name || user?.email.split('@')[0]}
                   </span>
                   <button
                     onClick={logout}
