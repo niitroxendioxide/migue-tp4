@@ -2,60 +2,56 @@
 
 /* CSS Variables Theme */
 @theme {
-/* Nueva paleta solicitada */
+  /* Nueva paleta solicitada - Colores base */
   --color-bg: #fefdda; /* fondo principal cálido */
   --color-bg-alt: #ffffff;
   --color-primary: #dd5a63; /* rojo acento */
   --color-primary-hover: #c4202a;
   /* Secundario (nuevo) */
-  --color-secondary: #BED7A6; /* azul violeta suave */
+  --color-secondary: #BED7A6; /* verde suave */
   --color-secondary-hover: #599B67;
   --color-success: #86BA90; /* verde */
   --color-success-hover: #6ca578;
+  --color-danger: #e74c3c; /* rojo peligro */
+  --color-danger-hover: #c0392b;
+  --color-warning: #b45309; /* naranja tostado */
+  --color-warning-hover: #92400e;
+  --color-info: #1e3a8a; /* azul profundo informativo */
+  --color-info-hover: #1d4ed8;
+  
   /* Superficies complementarias */
   --color-surface: #F1EFCF;
   --color-surface-alt: #E9E6C0;
   --color-border: #D9D5A8;
-  --color-radius: 0.75rem;
+  
+  /* Colores de texto semanticos - crearan utilidades text-* */
+  --color-text-base: #37251f; /* gris principal (gris 800) */
+  --color-text-soft: #374151; /* gris 700 */
+  --color-text-muted: #6b7280; /* gris 500 */
+  --color-text-subtle: #9ca3af; /* gris 400 */
+  --color-text-inverse: #ffffff; /* sobre fondos oscuros / overlays */
+  --color-text-primary: #dd5a63;
+  --color-text-secondary: #BED7A6;
+  --color-text-success: #86BA90;
+  --color-text-danger: #b91c1c;
+  --color-text-warning: #b45309;
+  --color-text-info: #1e3a8a;
+  --color-text-link: #dd5a63;
+  
+  /* Radios y sombras */
+  --radius-default: 0.75rem;
   --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
   --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.08),0 1px 2px -1px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08),0 2px 4px -2px rgba(0,0,0,0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08),0 4px 6px -4px rgba(0,0,0,0.04);
-
-  /* =====================================================
-     Colores de Texto (ajusta a tu gusto)
-     -----------------------------------------------------
-     Los utilitarios usan prefijo .u-text- para no chocar
-     con clases Tailwind (text-*)
-     ===================================================== */
-  --text-base: #37251f; /* gris principal (gris 800) */
-  --text-soft: #374151; /* gris 700 */
-  --text-muted: #6b7280; /* gris 500 */
-  --text-subtle: #9ca3af; /* gris 400 */
-  --text-inverse: #ffffff; /* sobre fondos oscuros / overlays */
-  --text-primary: var(--color-primary);
-  --text-primary-hover: var(--color-primary-hover);
-  --text-secondary: var(--color-secondary);
-  --text-secondary-hover: var(--color-secondary-hover);
-  --text-success: var(--color-success);
-  --text-success-hover: var(--color-success-hover);
-  --text-danger: #b91c1c; /* rojo peligro */
-  --text-danger-hover: #991b1b;
-  --text-warning: #b45309; /* naranja tostado */
-  --text-warning-hover: #92400e;
-  --text-info: #1e3a8a; /* azul profundo informativo */
-  --text-info-hover: #1d4ed8;
-  --text-link: var(--color-primary);
-  --text-link-hover: var(--color-primary-hover);
 }
-
 
 /* Base Typography & Reset */
 html { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial, sans-serif; }
 body {
   margin: 0;
   background: var(--color-bg);
-  color: var(--text-base);
+  color: var(--color-text-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -69,49 +65,17 @@ img { display: block; }
 h1,h2,h3,h4 { font-weight: 600; letter-spacing: -0.02em; }
 h1 { font-weight: 800; }
 
-/* Utilities */
-/* Eliminado gradient-text (no se usan gradientes en nueva línea visual) */
-.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--color-radius); box-shadow: var(--shadow-xs); }
+/* Utilities - Use Tailwind v4 classes directly in HTML instead */
+.card { 
+  background: var(--color-surface); 
+  border: 1px solid var(--color-border); 
+  border-radius: var(--radius-default); 
+  box-shadow: var(--shadow-xs); 
+}
 .card-hover { transition: box-shadow .25s ease, transform .25s ease; }
 .card-hover:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
 
-/* =====================================================
-  Utilidades de texto basadas en variables
-  (prefijo u-text- para evitar colisión con Tailwind)
-  ===================================================== */
-.u-text-base { color: var(--text-base); }
-.u-text-soft { color: var(--text-soft); }
-.u-text-muted { color: var(--text-muted); }
-.u-text-subtle { color: var(--text-subtle); }
-.u-text-inverse { color: var(--text-inverse); }
-.u-text-primary { color: var(--text-primary); }
-.u-text-secondary { color: var(--text-secondary); }
-.u-text-success { color: var(--text-success); }
-.u-text-danger { color: var(--text-danger); }
-.u-text-warning { color: var(--text-warning); }
-.u-text-info { color: var(--text-info); }
-.u-link { color: var(--text-link); text-decoration: none; }
-.u-link:hover { color: var(--text-link-hover); text-decoration: underline; }
-.u-text-gradient-primary { /* fallback visual simple sin gradiente real */ color: var(--text-primary); }
-
-/* Mapeo legacy Tailwind -> variables (permite migrar sin romper) */
-.u-text-strong { color: var(--text-base); }
-.u-text-title { color: var(--text-base); }
-.u-text-heading { color: var(--text-soft); }
-.u-text-muted-strong { color: var(--text-soft); }
-.u-text-muted { color: var(--text-muted); }
-.u-text-subtle { color: var(--text-subtle); }
-.u-text-inverse-soft { color: rgba(255,255,255,.85); }
-
-/* Hovers semánticos */
-.hover\:u-text-primary:hover { color: var(--text-primary); }
-.hover\:u-text-secondary:hover { color: var(--text-secondary); }
-.hover\:u-text-success:hover { color: var(--text-success); }
-.hover\:u-text-danger:hover { color: var(--text-danger); }
-.hover\:u-text-warning:hover { color: var(--text-warning); }
-.hover\:u-text-link:hover { color: var(--text-link-hover); }
-
-/* Line clamp utility */
+/* Line clamp utility (built into Tailwind v4) */
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 
