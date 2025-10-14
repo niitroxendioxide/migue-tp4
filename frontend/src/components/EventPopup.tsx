@@ -232,7 +232,7 @@ export const EventPopup: React.FC<EventPopupProps> = ({
 
                         <div className="flex items-start gap-3">
                             <span className="text-sm font-medium min-w-20 text-text-muted">Price:</span>
-                            <span className={`text-sm font-semibold ${is_paid ? 'text-text-success' : 'text-text-danger'}`}>
+                            <span className={`text-sm font-semibold ${is_paid ? 'text-text-danger' : ' text-text-success'}`}>
                                 {is_paid ? `$${price?.toFixed(2)}` : 'Free'}
                             </span>
                         </div>
@@ -324,7 +324,7 @@ export const EventPopup: React.FC<EventPopupProps> = ({
                                 {!is_cancelled && (
                                     <button
                                         onClick={handleAction}
-                                        disabled={purchaseLoading || walletLoading || attendanceLoading || (!canAfford && needsPayment)}
+                                        disabled={purchaseLoading || walletLoading || attendanceLoading || (isAuthenticated && !canAfford && needsPayment)}
                                         className="cursor-pointer h-11 px-8 rounded-md border-black bg-success hover:bg-success-hover text-text-inverse text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {purchaseLoading ? (
