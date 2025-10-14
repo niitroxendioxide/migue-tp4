@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 // Mock data for development
 const mockEvents: Event[] = [
   {
-    id: '1',
+    id: 1,
     title: 'Tech Conference 2025',
     date: '2025-11-15T09:00:00Z',
     description: 'Annual technology conference featuring the latest innovations in software development.',
@@ -21,7 +21,7 @@ const mockEvents: Event[] = [
     is_cancelled: false
   },
   {
-    id: '2',
+    id: 2,
     title: 'Community Art Exhibition',
     date: '2025-10-20T18:00:00Z',
     description: 'Local artists showcase their latest works in this community-driven art exhibition.',
@@ -33,7 +33,7 @@ const mockEvents: Event[] = [
     is_cancelled: false
   },
   {
-    id: '3',
+    id:3,
     title: 'Music Festival 2025',
     date: '2025-12-05T16:00:00Z',
     description: 'Three-day music festival featuring international and local artists.',
