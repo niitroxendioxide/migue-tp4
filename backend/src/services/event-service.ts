@@ -54,6 +54,30 @@ export async function getEventById(p_EventId: number): Promise<Event> {
 }
 
 export async function createEvent(p_EventRequest: CreateEventRequest) {
+  if (!p_EventRequest.title) {
+    throw new BadRequestError('Title is required');
+  }
+
+  if (!p_EventRequest.description) {
+    throw new BadRequestError('Description is required');
+  }
+
+  if (!p_EventRequest.date) {
+    throw new BadRequestError('Date is required');
+  }
+
+  if (!p_EventRequest.location) {
+    throw new BadRequestError('Location is required');
+  }
+
+  if (!p_EventRequest.image_url) {
+    throw new BadRequestError('Image url is required');
+  }
+
+  if (!p_EventRequest.price) {
+    throw new BadRequestError('Price is required');
+  }
+
   const event = await db.event.create({
     data: {
       title: p_EventRequest.title,
@@ -111,6 +135,17 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
 
   if (!user) {
     throw new BadRequestError('User not found');
+  }
+
+  const userAlreadyJoined = await db.eventUser.findFirst({
+    where: {
+      id_event: event.id,
+      id_user: user.id,
+    }
+  })
+
+  if (userAlreadyJoined) {
+    throw new BadRequestError('User already joined event');
   }
 
   const eventUser = await db.eventUser.create({
