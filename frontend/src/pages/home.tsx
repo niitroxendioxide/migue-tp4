@@ -45,7 +45,7 @@ const mockEvents: Event[] = [
     is_cancelled: false
   },
   {
-    id: '4',
+    id: 4,
     title: 'Startup Networking Night',
     date: '2025-10-30T19:00:00Z',
     description: 'Connect with entrepreneurs, investors, and innovators in the startup ecosystem.',
@@ -57,7 +57,7 @@ const mockEvents: Event[] = [
     is_cancelled: false
   },
   {
-    id: '5',
+    id: 5,
     title: 'Coding Workshop',
     date: '2025-11-02T10:00:00Z',
     description: 'Learn modern web development techniques in this hands-on workshop.',
@@ -114,7 +114,7 @@ export const HomePage: React.FC = () => {
     console.log('Selected event:', event);
   };
 
-  const handleJoinEvent = (eventId: string) => {
+  const handleJoinEvent = (eventId: number) => {
     console.log('Joining event with ID:', eventId);
     setPopupEvent(null);
   }
@@ -134,7 +134,9 @@ export const HomePage: React.FC = () => {
         {popupEvent && (
           <EventPopup
             {...popupEvent}
-            onConfirm={() => handleJoinEvent(popupEvent.id)}
+            id={popupEvent.id}
+            date={typeof popupEvent.date === 'string' ? popupEvent.date : popupEvent.date.toISOString()}
+            onConfirm={() => handleJoinEvent(Number(popupEvent.id))}
             onCancel={() => setPopupEvent(null)}
           />
         )}

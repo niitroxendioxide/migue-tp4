@@ -1,7 +1,7 @@
 export interface Event {
     id: number
     title: string
-    date: Date
+    date: Date | string
     description: string
     description_extended: string
     location: string

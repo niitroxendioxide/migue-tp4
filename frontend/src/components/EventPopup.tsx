@@ -6,7 +6,7 @@ import { useTickets } from '../contexts/TicketsContext';
 import { useAttendance } from '../contexts/AttendanceContext';
 
 interface Event {
-    id?: string;
+    id?: number;
     title: string;
     description?: string;
     description_extended?: string;
