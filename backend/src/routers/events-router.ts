@@ -1,6 +1,8 @@
 import { Router } from 'express'
-import { getAllEvents } from '../services/event-service'
+import { CreateEventRequest, JoinEventRequest } from '../../../shared/types'
+import { getAllEvents, createEvent, joinEvent, getEventById } from '../services/event-service'
 import { authMiddleware } from '../middleware/auth'
+import { ServerError } from '../middleware/errors'
 
 export const eventsRouter = Router()
 
@@ -14,17 +16,29 @@ eventsRouter.get('/', authMiddleware, async (req, res, next) => {
     }
 })
 
-eventsRouter.get('/create', authMiddleware, async (req, res, next) => {
+eventsRouter.post('/create', authMiddleware, async (req, res, next) => {
     try {
-        res.status(404)
+        const body = req.body as CreateEventRequest;
+        const event = await createEvent(body);
+
+        res.status(200).json(event);
     } catch(error) {
         next(error);
     }
 })
 
-eventsRouter.get('/join', authMiddleware, async (req, res, next) => {
+eventsRouter.post('/join', authMiddleware, async (req, res, next) => {
     try {
-        res.status(404)
+
+        const body = req.body as JoinEventRequest;
+        if (!body.eventId) {
+            throw new ServerError('Malformed JSON: Event id is required');
+        }
+
+        const response = await joinEvent(body.eventId, req.user.id);
+
+        res.status(200).json(response);
+
     } catch(error) {
         next(error);
     }
@@ -32,7 +46,10 @@ eventsRouter.get('/join', authMiddleware, async (req, res, next) => {
 
 eventsRouter.get('/:id', authMiddleware, async (req, res, next) => {
     try {
-        res.status(404)
+        const eventId = parseInt(req.params.id, 10);
+        const event = await getEventById(eventId);
+
+        res.status(200).json(event);
     } catch(error) {
         next(error);
     }

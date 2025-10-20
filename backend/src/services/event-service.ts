@@ -1,5 +1,5 @@
 import { db } from '../db/db'
-import { CreateEventRequest, Event } from '../../../shared/types'
+import { CreateEventRequest, Event, JoinEventRequest, JoinEventResponse } from '../../../shared/types'
 import { BadRequestError, ServerError } from '../middleware/errors'
 
 export async function getAllEvents() {
@@ -54,6 +54,30 @@ export async function getEventById(p_EventId: number): Promise<Event> {
 }
 
 export async function createEvent(p_EventRequest: CreateEventRequest) {
+  if (!p_EventRequest.title) {
+    throw new BadRequestError('Title is required');
+  }
+
+  if (!p_EventRequest.description) {
+    throw new BadRequestError('Description is required');
+  }
+
+  if (!p_EventRequest.date) {
+    throw new BadRequestError('Date is required');
+  }
+
+  if (!p_EventRequest.location) {
+    throw new BadRequestError('Location is required');
+  }
+
+  if (!p_EventRequest.image_url) {
+    throw new BadRequestError('Image url is required');
+  }
+
+  if (!p_EventRequest.price) {
+    throw new BadRequestError('Price is required');
+  }
+
   const event = await db.event.create({
     data: {
       title: p_EventRequest.title,
@@ -65,5 +89,80 @@ export async function createEvent(p_EventRequest: CreateEventRequest) {
     }
   })
 
+  if (!event) {
+    throw new ServerError('Error creating event');
+  }
+
   return event
+}
+
+export async function joinEvent(p_EventId: number, p_UserId: number): Promise<JoinEventResponse> {
+  const event = await db.event.findUnique({
+    where: {
+      id: p_EventId,
+    },
+
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      date: true,
+      location: true,
+      image_url: true,
+      price: true,
+    }
+  })
+
+  if (!event) {
+    throw new BadRequestError('Event not found');
+  }
+
+  const user = await db.user.findUnique({
+    where: {
+      id: p_UserId,
+    },
+
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      balance: true,
+      isAdmin: true,
+      dni: true,
+      full_name: true,
+    }
+  })
+
+  if (!user) {
+    throw new BadRequestError('User not found');
+  }
+
+  const userAlreadyJoined = await db.eventUser.findFirst({
+    where: {
+      id_event: event.id,
+      id_user: user.id,
+    }
+  })
+
+  if (userAlreadyJoined) {
+    throw new BadRequestError('User already joined event');
+  }
+
+  const eventUser = await db.eventUser.create({
+    data: {
+      id: event.id,
+      id_user: user.id,
+      id_event: event.id,
+    }
+  })
+
+  if (!eventUser) {
+    throw new ServerError('Error joining event');
+  }
+
+  return {
+    success: true,
+    eventUser: eventUser,
+    message: 'Event joined successfully',
+  } as JoinEventResponse
 }

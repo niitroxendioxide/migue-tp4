@@ -108,7 +108,17 @@ export async function handleLoginRequest(p_Request: LoginRequest): Promise<Login
 }
 
 export async function handleRegisterRequest(p_Request: RegisterRequest): Promise<RegisterResponse> {
-    console.log(p_Request);
+    if (!p_Request.email || !p_Request.password || !p_Request.username || !p_Request.full_name || !p_Request.DNI) {
+        throw new BadRequestError('Missing required fields');
+    }
+
+    if (p_Request.DNI <= 0) {
+        throw new BadRequestError('DNI Inválido');
+    }
+
+    if (!p_Request.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+        throw new BadRequestError('Invalid email');
+    }
     
     const existing_user = await getUserByEmail(p_Request.email);
 

@@ -12,10 +12,9 @@ export interface Event {
 }
 
 export interface EventUser {
-    id: string
-    id_user: string
-    id_event: string
-    
+    id: number
+    id_user: number
+    id_event: number
 }
 
 export interface User {
@@ -70,8 +69,7 @@ export interface AllEventsResponse {
 }
 
 export interface JoinEventRequest {
-    eventId: string
-    userId: string
+    eventId: number
 }
 
 export interface JoinEventResponse {
