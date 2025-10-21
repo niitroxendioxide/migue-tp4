@@ -6,11 +6,6 @@ import { CreateEventPage } from './pages/create-event';
 import WalletPage from './pages/wallet';
 import TicketsPage from './pages/tickets';
 import ProfilePage from './pages/profile';
-import { AuthProvider } from './contexts/AuthContext';
-import { WalletProvider } from './contexts/WalletContext';
-import { TicketsProvider } from './contexts/TicketsContext';
-import { EventsProvider } from './contexts/EventsContext';
-import { AttendanceProvider } from './contexts/AttendanceContext';
 import './index.css';
 
 const App: React.FC = () => {
@@ -54,17 +49,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <WalletProvider>
-        <TicketsProvider>
-          <AttendanceProvider>
-            <EventsProvider>
-              <App />
-            </EventsProvider>
-          </AttendanceProvider>
-        </TicketsProvider>
-      </WalletProvider>
-    </AuthProvider>
+    <App />
   </React.StrictMode>
 );
 

@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { Layout } from '../components/Layout';
-import { useAuth } from '../contexts/AuthContext';
-import { useEvents } from '../contexts/EventsContext';
+import { useEventCreation, useEvents } from '../hooks/EventsHook';
 
 interface EventFormData {
   title: string;
   description: string;
-  description_extended: string;
   date: string;
   time: string;
   location: string;
@@ -16,14 +14,13 @@ interface EventFormData {
 }
 
 export const CreateEventPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const { createEvent, loading: eventsLoading } = useEvents();
+  const isAuthenticated = true;
+  const { createEvent, loading: eventsLoading } = useEventCreation();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState<EventFormData>({
     title: '',
     description: '',
-    description_extended: '',
     date: '',
     time: '',
     location: '',
@@ -68,12 +65,10 @@ export const CreateEventPage: React.FC = () => {
       const eventId = await createEvent({
         title: formData.title,
         description: formData.description,
-        description_extended: formData.description_extended,
         date: eventDateTime.toISOString(),
         location: formData.location,
         image_url: formData.image_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
         price: formData.is_paid ? parseFloat(formData.price) : 0,
-        is_paid: formData.is_paid
       });
 
       console.log('Evento creado con ID:', eventId);
@@ -169,21 +164,7 @@ export const CreateEventPage: React.FC = () => {
               <p className="mt-1 text-xs text-text-subtle">Máximo 160 caracteres recomendados</p>
             </div>
 
-            {/* Descripción extendida */}
-            <div>
-              <label htmlFor="description_extended" className="block text-sm font-medium text-text-base mb-2">
-                Descripción Detallada
-              </label>
-              <textarea
-                id="description_extended"
-                name="description_extended"
-                rows={5}
-                value={formData.description_extended}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-border rounded-md bg-surface-alt text-text-base placeholder:text-text-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none"
-                placeholder="Descripción detallada con agenda, oradores, actividades, etc..."
-              />
-            </div>
+
 
             {/* Fecha y Hora */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

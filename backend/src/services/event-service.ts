@@ -74,7 +74,7 @@ export async function createEvent(p_EventRequest: CreateEventRequest) {
     throw new BadRequestError('Image url is required');
   }
 
-  if (!p_EventRequest.price) {
+  if (p_EventRequest.price === undefined || p_EventRequest.price === null) {
     throw new BadRequestError('Price is required');
   }
 
@@ -150,13 +150,22 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
 
   const eventUser = await db.eventUser.create({
     data: {
-      id: event.id,
       id_user: user.id,
       id_event: event.id,
     }
   })
 
-  if (!eventUser) {
+  const updateBalanceResult = await db.user.update({
+    data: {
+      balance: user.balance - event.price,
+    },
+
+    where: {
+      id: user.id,
+    }
+  })
+
+  if (!eventUser || !updateBalanceResult) {
     throw new ServerError('Error joining event');
   }
 
@@ -165,4 +174,32 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
     eventUser: eventUser,
     message: 'Event joined successfully',
   } as JoinEventResponse
+}
+
+export async function viewJoinedEvents(p_UserId: number) {
+  const userJoinedEvents = await db.eventUser.findMany({
+    where: {
+      id_user: p_UserId,
+    },
+
+    select: {
+      event: true,
+    }
+  })
+
+  console.log(userJoinedEvents)
+
+  if (!userJoinedEvents) {
+    return {
+      success: true,
+      events: [],
+    }
+  }
+
+  
+
+  return {
+    success: true,
+    events: userJoinedEvents,
+  }
 }

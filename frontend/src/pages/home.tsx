@@ -4,80 +4,24 @@ import { EventCard } from '../components/EventCard';
 import { SearchFilter } from '../components/SearchFilter';
 import { Event } from '../types';
 import { EventPopup } from '../components/EventPopup';
-import { useAuth } from '../contexts/AuthContext';
+import { useEvents } from '../hooks/EventsHook';
 
-// Mock data for development
-const mockEvents: Event[] = [
-  {
-    id: 1,
-    title: 'Tech Conference 2025',
-    date: '2025-11-15T09:00:00Z',
-    description: 'Annual technology conference featuring the latest innovations in software development.',
-    description_extended: 'Join us for a full day of presentations, workshops, and networking opportunities with industry leaders. Learn about cutting-edge technologies, best practices, and future trends that will shape the tech industry.',
-    location: 'San Francisco Convention Center',
-    image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    price: 299.99,
-    is_paid: true,
-    is_cancelled: false
-  },
-  {
-    id: 2,
-    title: 'Community Art Exhibition',
-    date: '2025-10-20T18:00:00Z',
-    description: 'Local artists showcase their latest works in this community-driven art exhibition.',
-    description_extended: 'Discover the vibrant local art scene with works from over 50 community artists. Enjoy wine, music, and the opportunity to purchase original pieces.',
-    location: 'Downtown Art Gallery',
-    image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    price: 0,
-    is_paid: false,
-    is_cancelled: false
-  },
-  {
-    id:3,
-    title: 'Music Festival 2025',
-    date: '2025-12-05T16:00:00Z',
-    description: 'Three-day music festival featuring international and local artists.',
-    description_extended: 'Experience three days of non-stop music across multiple stages. From rock to electronic, folk to hip-hop, there\'s something for every music lover.',
-    location: 'Golden Gate Park',
-    image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    price: 150.00,
-    is_paid: true,
-    is_cancelled: false
-  },
-  {
-    id: 4,
-    title: 'Startup Networking Night',
-    date: '2025-10-30T19:00:00Z',
-    description: 'Connect with entrepreneurs, investors, and innovators in the startup ecosystem.',
-    description_extended: 'An evening dedicated to fostering connections in the startup community. Meet potential co-founders, investors, and collaborators while enjoying drinks and appetizers.',
-    location: 'Innovation Hub',
-    image_url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    price: 25.00,
-    is_paid: true,
-    is_cancelled: false
-  },
-  {
-    id: 5,
-    title: 'Coding Workshop',
-    date: '2025-11-02T10:00:00Z',
-    description: 'Learn modern web development techniques in this hands-on workshop.',
-    description_extended: 'Perfect for beginners and intermediate developers. We\'ll cover React, TypeScript, and modern development tools. All materials and refreshments provided.',
-    location: 'Tech Learning Center',
-    image_url: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    price: 0,
-    is_paid: false,
-    is_cancelled: false
-  }
-];
 
 export const HomePage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const [events, setEvents] = useState<Event[]>(mockEvents);
+  const isAuthenticated = true; // Replace with actual authentication logic
+  const {events,loading,error, getAllEvents} = useEvents();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const [loading, setLoading] = useState(false);
   const [popupEvent, setPopupEvent] = useState<Event | null>(null);
 
+  useEffect(() => {
+    // getAllEvents está memoizado con useCallback en el hook, así que es seguro incluirlo en deps
+    getAllEvents().catch((err) => {
+      console.error('Error fetching events', err);
+    });
+    console.log(events);
+  }, [getAllEvents]);
   // Filter and search logic
   const filteredEvents = useMemo(() => {
     let filtered = [...events];

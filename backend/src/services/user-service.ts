@@ -119,8 +119,8 @@ export async function handleRegisterRequest(p_Request: RegisterRequest): Promise
     if (!p_Request.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
         throw new BadRequestError('Invalid email');
     }
-    
     const existing_user = await getUserByEmail(p_Request.email);
+    
 
     if (existing_user) {
         throw new BadRequestError('Email already in use');

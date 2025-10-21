@@ -20,6 +20,7 @@ registerRouter.post('/register', async (req, res, next) => {
 registerRouter.post('/login', async (req, res, next) => {
     try {
         const body = req.body as LoginRequest;
+        console.log("login req: ", body);
         const response = await handleLoginRequest(body);
         
         res.status(200).json(response);

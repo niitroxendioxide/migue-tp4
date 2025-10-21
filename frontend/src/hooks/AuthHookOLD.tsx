@@ -1,41 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../types';
 
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  username?: string;
-  full_name?: string;
-  DNI?: number;
-}
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface RegisterRequest {
-  username: string;
-  full_name: string;
-  email: string;
-  DNI: number;
-  password: string;
-}
-
-interface RegisterResponse {
-  success: boolean;
-  user?: User;
-  token?: string;
-  message?: string;
-}
-
-interface LoginResponse {
-  success: boolean;
-  user?: User;
-  token?: string;
-  message?: string;
-}
 
 interface AuthContextType {
   user: User | null;
@@ -139,7 +104,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('Error response:', errorText);
         return {
           success: false,
-          message: `Error del servidor: ${response.status}`,
         };
       }
 
@@ -161,13 +125,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         return {
           success: false,
-          message: 'No se puede conectar al servidor. Verifica que el backend esté funcionando en http://localhost:3000',
         };
       }
       
       return {
         success: false,
-        message: `Error de conexión: ${error instanceof Error ? error.message : 'Error desconocido'}`,
+
       };
     }
   };

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useWallet } from '../contexts/WalletContext';
-import { useAuth } from '../contexts/AuthContext';
+import React, { use, useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
-
+import { useBalanceCharge } from '../hooks/BalanceHook';
+import { useAuth } from '../hooks/AuthHookOLD';
+import { useAuthStore } from '../authStore/authStore';
 interface TopUpModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -10,7 +10,8 @@ interface TopUpModalProps {
 }
 
 const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const { addFunds, loading } = useWallet();
+  const isAuthenticated = true; // Replace with actual authentication logic
+  const { chargeAmount, loading, error: errorCargandoBalance } = useBalanceCharge();
   const [amount, setAmount] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
@@ -33,7 +34,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
       return;
     }
 
-    const result = await addFunds(numAmount);
+    const result = await chargeAmount(numAmount);
     if (result) {
       setSuccess(`¡Recarga exitosa! Se agregaron $${numAmount.toFixed(2)} a tu billetera`);
       setAmount('');
@@ -49,12 +50,12 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div onClick={() => onClose()} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-text-dark">Recargar Saldo</h2>
           <button
-            onClick={onClose}
+            onClick={() => onClose()}
             className="text-text-muted hover:text-text-dark text-2xl"
           >
             ×
@@ -87,7 +88,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
                 <button
                   key={preset}
                   type="button"
-                  onClick={() => setAmount(preset.toString())}
+                  onClick={() => chargeAmount(preset)}
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary focus:border-primary"
                   disabled={loading}
                 >
@@ -97,9 +98,9 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
             </div>
           </div>
 
-          {error && (
+          {errorCargandoBalance && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
+              {errorCargandoBalance}
             </div>
           )}
 
@@ -112,7 +113,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
           <div className="flex gap-3 pt-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => onClose()}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-text-dark hover:bg-gray-50"
               disabled={loading}
             >
@@ -122,6 +123,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
               type="submit"
               className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading || !amount}
+              onClick={() => chargeAmount(parseFloat(amount))}
             >
               {loading ? 'Procesando...' : 'Recargar'}
             </button>
@@ -133,52 +135,15 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
 };
 
 const WalletPage: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
-  const { balance, transactions, loading, getTransactionHistory } = useWallet();
+  const user = { email: 'user@example.com' };
+  const isAuthenticated = true; // Replace with actual authentication logic
+  const loading = false; // Replace with actual loading state
   const [showTopUpModal, setShowTopUpModal] = useState(false);
-
+  const balance = useAuthStore.getState().user?.balance ?? 0;
   if (!isAuthenticated) {
     window.location.hash = '/auth';
     return null;
   }
-
-  const transactionHistory = getTransactionHistory();
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case 'deposit':
-        return '⬆️';
-      case 'purchase':
-        return '⬇️';
-      case 'refund':
-        return '↩️';
-      default:
-        return '💳';
-    }
-  };
-
-  const getTransactionColor = (type: string) => {
-    switch (type) {
-      case 'deposit':
-      case 'refund':
-        return 'text-green-600';
-      case 'purchase':
-        return 'text-red-600';
-      default:
-        return 'text-text-dark';
-    }
-  };
 
   return (
     <Layout>
@@ -193,11 +158,11 @@ const WalletPage: React.FC = () => {
             <div className="text-right">
               <p className="text-white/80 text-sm">Saldo disponible</p>
               <p className="text-3xl font-bold">
-                ${loading ? '...' : balance.toFixed(2)}
+                ${loading ? '...' : balance}
               </p>
             </div>
           </div>
-          
+
           <div className="mt-6">
             <button
               onClick={() => setShowTopUpModal(true)}
@@ -209,111 +174,14 @@ const WalletPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Estadísticas rápidas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <span className="text-green-600">⬆️</span>
-              </div>
-              <div>
-                <p className="text-text-muted text-sm">Total Recargado</p>
-                <p className="font-bold text-lg">
-                  ${transactionHistory
-                    .filter(t => t.type === 'deposit')
-                    .reduce((sum, t) => sum + t.amount, 0)
-                    .toFixed(2)}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <span className="text-red-600">⬇️</span>
-              </div>
-              <div>
-                <p className="text-text-muted text-sm">Total Gastado</p>
-                <p className="font-bold text-lg">
-                  ${Math.abs(transactionHistory
-                    .filter(t => t.type === 'purchase')
-                    .reduce((sum, t) => sum + t.amount, 0))
-                    .toFixed(2)}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <span className="text-blue-600">📊</span>
-              </div>
-              <div>
-                <p className="text-text-muted text-sm">Transacciones</p>
-                <p className="font-bold text-lg">{transactionHistory.length}</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Historial de transacciones */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-text-dark">Historial de Transacciones</h2>
-          </div>
-          
-          <div className="p-6">
-            {loading ? (
-              <div className="text-center py-8 text-text-muted">
-                Cargando transacciones...
-              </div>
-            ) : transactionHistory.length === 0 ? (
-              <div className="text-center py-8 text-text-muted">
-                <p className="text-4xl mb-4">💳</p>
-                <p>No tienes transacciones aún</p>
-                <p className="text-sm">¡Recarga tu billetera para empezar!</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {transactionHistory.map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-2xl">
-                        {getTransactionIcon(transaction.type)}
-                      </span>
-                      <div>
-                        <p className="font-medium text-text-dark">
-                          {transaction.description}
-                        </p>
-                        <p className="text-sm text-text-muted">
-                          {formatDate(transaction.date)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className={`font-bold text-lg ${getTransactionColor(transaction.type)}`}>
-                        {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toFixed(2)}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        ID: {transaction.id.slice(-8)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       <TopUpModal
         isOpen={showTopUpModal}
-        onClose={() => setShowTopUpModal(false)}
+        onClose={() => {setShowTopUpModal(false);}}
         onSuccess={() => {
           // La recarga fue exitosa, el contexto ya se actualizó
         }}

@@ -1,22 +1,7 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useWallet } from '../contexts/WalletContext';
-import { useTickets } from '../contexts/TicketsContext';
-import { useAttendance } from '../contexts/AttendanceContext';
-
-interface Event {
-    id?: number;
-    title: string;
-    description?: string;
-    description_extended?: string;
-    date: string;
-    location: string;
-    image_url?: string;
-    price?: number;
-    is_paid: boolean;
-    is_cancelled: boolean;
-}
+import React, { use, useState } from 'react';
+import { useEventJoin } from '../hooks/EventsHook';
+import { Event } from '../types/index';
+import { useAuthStore } from '../authStore/authStore';
 
 interface EventPopupProps extends Event {
     onConfirm: () => void;
@@ -37,16 +22,16 @@ export const EventPopup: React.FC<EventPopupProps> = ({
     onConfirm,
     onCancel,
 }) => {
-    const { isAuthenticated } = useAuth();
-    const { balance, debitFunds, loading: walletLoading } = useWallet();
-    const { addTicket } = useTickets();
-    const { confirmAttendance, cancelAttendance, isAttending, loading: attendanceLoading } = useAttendance();
     
-    const [purchaseLoading, setPurchaseLoading] = useState(false);
+    const { joinEvent, loading: joiningEvent, error } = useEventJoin();
+    const isAttending = (eventId: number) => false;
+    const isAuthenticated = useAuthStore.getState().isAuthenticated;
+    const balance = useAuthStore.getState().user?.balance ?? 0;
+    const attendanceLoading = false;
     const [purchaseError, setPurchaseError] = useState<string>('');
     const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
-    const eventId = id || `temp_${Date.now()}`;
+    const eventId = id;
     const canAfford = !is_paid || (price ? balance >= price : true);
     const needsPayment = Boolean(is_paid && price && price > 0);
     const isEventFree = Boolean(!is_paid || price === 0);
@@ -62,78 +47,29 @@ export const EventPopup: React.FC<EventPopupProps> = ({
             return;
         }
 
-        setPurchaseLoading(true);
         setPurchaseError('');
 
         try {
-            if (isEventFree) {
-                // FLUJO GRATUITO: Confirmar/Cancelar Asistencia
-                if (userIsAttending) {
-                    // Cancelar asistencia
-                    const success = await cancelAttendance(eventId);
-                    if (success) {
-                        setPurchaseSuccess(true);
-                        setTimeout(() => {
-                            onConfirm();
-                        }, 1500);
-                    } else {
-                        setPurchaseError('Error al cancelar asistencia. Intenta nuevamente.');
-                    }
-                } else {
-                    // Confirmar asistencia
-                    const success = await confirmAttendance({
-                        eventId: eventId,
-                        eventTitle: title,
-                        eventDate: date,
-                        eventLocation: location,
-                        eventImage: image_url
-                    });
-                    if (success) {
-                        setPurchaseSuccess(true);
-                        setTimeout(() => {
-                            onConfirm();
-                        }, 1500);
-                    } else {
-                        setPurchaseError('Error al confirmar asistencia. Intenta nuevamente.');
-                    }
-                }
+            if (userIsAttending) {
+                // Cancelar asistencia
             } else {
-                // FLUJO PAGO: Comprar Entrada
-                if (!canAfford) {
-                    setPurchaseError('Saldo insuficiente. Recarga tu billetera para continuar.');
-                    return;
-                }
-
-                const success = await debitFunds(
-                    price!,
-                    `Entrada para: ${title}`,
+                // Confirmar asistencia
+                const success = await joinEvent(
                     eventId
                 );
-
                 if (success) {
-                    // Agregar ticket a la colección del usuario
-                    addTicket({
-                        eventTitle: title,
-                        eventDate: date,
-                        eventLocation: location,
-                        price: price!,
-                        transactionId: `txn_${Date.now()}`,
-                        eventImage: image_url
-                    });
-                    
                     setPurchaseSuccess(true);
                     setTimeout(() => {
                         onConfirm();
                     }, 1500);
                 } else {
-                    setPurchaseError('Error al procesar el pago. Intenta nuevamente.');
+                    setPurchaseError('Error al confirmar asistencia. Intenta nuevamente.');
                 }
             }
+
         } catch (error) {
             setPurchaseError('Error al procesar la acción. Intenta nuevamente.');
-        } finally {
-            setPurchaseLoading(false);
-        }
+        } 
     };    // Close on ESC and lock background scroll while modal is open
     React.useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
@@ -247,14 +183,14 @@ export const EventPopup: React.FC<EventPopupProps> = ({
                         <div className="text-center">
                             <div className="text-4xl mb-2">✅</div>
                             <p className="text-lg font-medium text-green-600 mb-1">
-                                {isEventFree ? 
-                                    (userIsAttending ? '¡Asistencia cancelada!' : '¡Asistencia confirmada!') : 
+                                {isEventFree ?
+                                    (userIsAttending ? '¡Asistencia cancelada!' : '¡Asistencia confirmada!') :
                                     '¡Compra exitosa!'
                                 }
                             </p>
                             <p className="text-sm text-text-muted">
-                                {isEventFree ? 
-                                    (userIsAttending ? 'Has cancelado tu asistencia al evento' : 'Te has unido al evento') : 
+                                {isEventFree ?
+                                    (userIsAttending ? 'Has cancelado tu asistencia al evento' : 'Te has unido al evento') :
                                     'Te has unido al evento'
                                 }
                             </p>
@@ -316,7 +252,7 @@ export const EventPopup: React.FC<EventPopupProps> = ({
                                 <button
                                     onClick={onCancel}
                                     className="h-11 px-8 rounded-md cursor-pointer border-black bg-danger hover:bg-danger-hover text-text-inverse text-sm font-medium border transition-colors"
-                                    disabled={purchaseLoading}
+                                    disabled={joiningEvent}
                                 >
                                     Cancelar
                                 </button>
@@ -324,10 +260,10 @@ export const EventPopup: React.FC<EventPopupProps> = ({
                                 {!is_cancelled && (
                                     <button
                                         onClick={handleAction}
-                                        disabled={purchaseLoading || walletLoading || attendanceLoading || (isAuthenticated && !canAfford && needsPayment)}
+                                        disabled={joiningEvent  || attendanceLoading || (isAuthenticated && !canAfford && needsPayment)}
                                         className="cursor-pointer h-11 px-8 rounded-md border-black bg-success hover:bg-success-hover text-text-inverse text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {purchaseLoading ? (
+                                        {joiningEvent ? (
                                             <div className="flex items-center gap-2">
                                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                                 Procesando...

@@ -87,6 +87,11 @@ export interface CreateEventRequest {
     price: number
 }
 
+export interface CreateEventResponse {
+    success: boolean
+    event?: Event
+    message?: string
+}
 export interface ChargeBalanceRequest {
     amount: number
 }
@@ -94,6 +99,11 @@ export interface ChargeBalanceRequest {
 export interface ChargeBalanceResponse {
     success: boolean
     newBalance?: number
+}
+
+export interface ViewJoinedEventsResponse {
+    success: boolean,
+    events: Event[],
 }
 
 /* nombre de usuario, su nombre de pila,

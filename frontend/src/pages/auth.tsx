@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Layout } from '../components/Layout';
-import { useAuth } from '../contexts/AuthContext';
-
+import { useRegister, useLogin } from '../hooks/AuthHook';
 type AuthMode = 'login' | 'register';
 
 export const AuthPage: React.FC = () => {
-  const { login, register, isAuthenticated } = useAuth();
+  const {attemptLogin, loading: loginLoading, error: loginError} = useLogin();
+  const {attemptRegister, loading: registerLoading, error: registerError} = useRegister();
+  const isAuthenticated = false; // Replace with actual authentication logic
   
   // Redirigir si ya está autenticado
   React.useEffect(() => {
@@ -76,7 +77,7 @@ export const AuthPage: React.FC = () => {
     try {
       if (authMode === 'login') {
         // Login
-        const result = await login(formData.email, formData.password);
+        const result = await attemptLogin({email: formData.email, password: formData.password});
         
         if (result.success) {
           setSuccess('¡Inicio de sesión exitoso!');
@@ -93,7 +94,7 @@ export const AuthPage: React.FC = () => {
           return;
         }
 
-        const result = await register({
+        const result = await attemptRegister({
           username: formData.username,
           full_name: formData.full_name,
           email: formData.email,
@@ -107,7 +108,7 @@ export const AuthPage: React.FC = () => {
             window.location.hash = '#/';
           }, 1000);
         } else {
-          setError(result.message || 'Error al registrarse');
+          setError('Error al registrarse');
         }
       }
     } catch (error) {

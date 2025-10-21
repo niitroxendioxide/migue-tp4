@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useEvents } from '../contexts/EventsContext';
-import { useWallet } from '../contexts/WalletContext';
-import { useTickets } from '../contexts/TicketsContext';
-import { useAttendance } from '../contexts/AttendanceContext';
 import { Layout } from '../components/Layout';
-
+import { useAuthStore } from '../authStore/authStore';
 interface CancelEventModalProps {
   isOpen: boolean;
   eventTitle: string;
@@ -59,19 +54,13 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
 };
 
 const ProfilePage: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
-  const { balance } = useWallet();
-  const { tickets } = useTickets();
-  const { attendances } = useAttendance();
-  const { 
-    createdEvents, 
-    loading: eventsLoading, 
-    cancelEvent,
-    getUpcomingEvents,
-    getPastEvents,
-    getCancelledEvents
-  } = useEvents();
-
+  const user = useAuthStore.getState().user;
+  const isAuthenticated = useAuthStore.getState().isAuthenticated;
+  const balance = useAuthStore.getState().user?.balance ?? 0;
+  const createdEvents = [
+    // Mock data for created events
+    { id: '1', title: 'Concierto de Rock', date: '2024-09-15T20:00:00Z', location: 'Auditorio Nacional', is_paid: true, price: 50.00, attendees: 150, is_cancelled: false, description: 'Un increíble concierto de rock con bandas locales.', image_url: '' },
+  ];
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'cancelled'>('upcoming');
   const [cancelModal, setCancelModal] = useState<{ isOpen: boolean; eventId: string; eventTitle: string }>({
     isOpen: false,
@@ -85,9 +74,7 @@ const ProfilePage: React.FC = () => {
     return null;
   }
 
-  const upcomingEvents = getUpcomingEvents();
-  const pastEvents = getPastEvents();
-  const cancelledEvents = getCancelledEvents();
+
 
   const handleCancelEvent = async () => {
     setCancelLoading(true);
@@ -175,18 +162,6 @@ const ProfilePage: React.FC = () => {
     </div>
   );
 
-  const getActiveEvents = () => {
-    switch (activeTab) {
-      case 'upcoming':
-        return upcomingEvents;
-      case 'past':
-        return pastEvents;
-      case 'cancelled':
-        return cancelledEvents;
-      default:
-        return upcomingEvents;
-    }
-  };
 
   return (
     <Layout>
@@ -222,18 +197,7 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <span className="text-green-600">🎟️</span>
-              </div>
-              <div>
-                <p className="text-text-muted text-sm">Eventos/Tickets</p>
-                <p className="font-bold text-lg">{tickets.length + attendances.length}</p>
-              </div>
-            </div>
-          </div>
-
+          
           <div className="bg-white p-4 rounded-lg border border-gray-200">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -248,17 +212,7 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <span className="text-yellow-600">⭐</span>
-              </div>
-              <div>
-                <p className="text-text-muted text-sm">Eventos Activos</p>
-                <p className="font-bold text-lg">{upcomingEvents.length}</p>
-              </div>
-            </div>
-          </div>
+          
         </div>
 
         {/* Gestión de eventos creados */}
@@ -275,61 +229,8 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="px-6 pt-6">
-            <div className="flex border-b border-gray-200">
-              {[
-                { key: 'upcoming', label: 'Próximos', count: upcomingEvents.length },
-                { key: 'past', label: 'Pasados', count: pastEvents.length },
-                { key: 'cancelled', label: 'Cancelados', count: cancelledEvents.length }
-              ].map(tab => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === tab.key
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-text-muted hover:text-text-dark'
-                  }`}
-                >
-                  {tab.label} ({tab.count})
-                </button>
-              ))}
-            </div>
-          </div>
 
-          {/* Lista de eventos */}
-          <div className="p-6">
-            {eventsLoading ? (
-              <div className="text-center py-8 text-text-muted">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mx-auto mb-4"></div>
-                Cargando eventos...
-              </div>
-            ) : getActiveEvents().length === 0 ? (
-              <div className="text-center py-8 text-text-muted">
-                <p className="text-4xl mb-4">
-                  {activeTab === 'upcoming' ? '📅' : activeTab === 'past' ? '📚' : '❌'}
-                </p>
-                <p>
-                  {activeTab === 'upcoming' && 'No tienes eventos próximos'}
-                  {activeTab === 'past' && 'No tienes eventos pasados'}
-                  {activeTab === 'cancelled' && 'No tienes eventos cancelados'}
-                </p>
-                {activeTab === 'upcoming' && (
-                  <a
-                    href="#/create-event"
-                    className="inline-block mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-                  >
-                    Crear tu primer evento
-                  </a>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {getActiveEvents().map(event => renderEventCard(event, activeTab === 'upcoming'))}
-              </div>
-            )}
-          </div>
+          
         </div>
       </div>
 

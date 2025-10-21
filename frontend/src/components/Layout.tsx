@@ -1,6 +1,5 @@
 import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useWallet } from '../contexts/WalletContext';
+import { useAuthStore } from '../authStore/authStore';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,18 +13,21 @@ interface NavItem {
 
 // Simple placeholder for active nav logic (could be improved with routing later)
 const getNavItems = (isAuthenticated: boolean): NavItem[] => [
-  { label: 'Eventos', href: '#/', current: window.location.hash === '#/' || window.location.hash === '' },
+  { label: 'Eventos', href: '/', current: window.location.hash === '#/' || window.location.hash === '' },
   ...(isAuthenticated ? [
-    { label: 'Crear Evento', href: '#/create-event', current: window.location.hash === '#/create-event' },
-    { label: 'Mi Billetera', href: '#/wallet', current: window.location.hash === '#/wallet' },
-    { label: 'Mi Perfil', href: '#/profile', current: window.location.hash === '#/profile' }
+    { label: 'Crear Evento', href: '/create-event', current: window.location.hash === '#/create-event' },
+    { label: 'Mi Billetera', href: '/wallet', current: window.location.hash === '/wallet' },
+    { label: 'Mi Perfil', href: '/profile', current: window.location.hash === '#/profile' }
   ] : []),
-  { label: 'Mis Tickets', href: '#/tickets', current: window.location.hash === '#/tickets' }
+  { label: 'Mis Tickets', href: '/tickets', current: window.location.hash === '#/tickets' }
 ];
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, isAuthenticated, logout, loading } = useAuth();
-  const { balance } = useWallet();
+  const user = useAuthStore.getState().user;
+  const isAuthenticated = useAuthStore.getState().isAuthenticated;
+  const balance =  useAuthStore.getState().user?.balance ?? 0;
+  const loading = false; // Replace with actual loading state
+  const logout = useAuthStore.getState().logout;
   
   const navItems = getNavItems(isAuthenticated);
 
@@ -84,7 +86,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <span className="font-medium">${balance.toFixed(2)}</span>
                   </a>
                   <span className="text-sm text-text-inverse hidden sm:block">
-                    Hola, {user?.firstName || user?.username || user?.full_name || user?.email.split('@')[0]}
+                    Hola, {user?.name || user?.full_name || user?.email.split('@')[0]}
                   </span>
                   <button
                     onClick={logout}

@@ -36,3 +36,20 @@ export async function chargeBalance(p_UserId: number, p_Amount: number): Promise
         newBalance: new_balance,
     } as ChargeBalanceResponse;
 }
+
+export async function getBalance(p_UserId: number): Promise<number> {
+    const user = await db.user.findUnique({
+        where: {
+            id: p_UserId,
+        },
+        select: {
+            balance: true,
+        }
+    });
+
+    if (!user) {
+        throw new ValidationError("Invalid user");
+    }
+
+    return user.balance;
+}
