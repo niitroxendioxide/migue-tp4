@@ -47,7 +47,7 @@ export function useBalanceCharge() {
 
         const data = await response.json();
         setBalance(data ?? 0);
-        useAuthStore.getState().updateBalance(data.newBalance ?? 0);
+        useAuthStore.getState().updateBalance(data ?? 0);
     }
 
     const chargeAmount = useCallback(async (amount: number): Promise<ChargeBalanceResponse> => {

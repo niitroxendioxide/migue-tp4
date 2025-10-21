@@ -14,17 +14,51 @@ const TicketsPage: React.FC = () => {
 
   return (
     <Layout>
-      <h1>Mis Entradas</h1>
-      <ul>
-        {!loading && (!Array.isArray(joinedEvents) || joinedEvents.length === 0) ? (
-          <li>No tienes entradas compradas.</li>
-        ) : (
-          Array.isArray(joinedEvents) ? joinedEvents.map(event => (
-            <li key={event.id}>{event.title}</li>
-          )) : null
-        )}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-2xl font-bold mb-6">Mis Entradas</h1>
 
-      </ul>
+        {(!loading && (!Array.isArray(joinedEvents) || joinedEvents.length === 0)) ? (
+          <div className="p-6 bg-surface border border-border rounded-lg text-center text-text-muted">No tienes entradas compradas.</div>
+        ) : (
+          <div className="grid gap-4">
+            {Array.isArray(joinedEvents) && joinedEvents.map((joined, idx) => {
+              const e = (joined as any).event || joined;
+              const dateObj = new Date(e.date);
+              const dateStr = dateObj.toLocaleString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+              const priceLabel = !e.is_paid ? 'Gratis' : `$${(e.price ?? 0).toFixed(2)}`;
+
+              return (
+                <div key={e.id ?? idx} className="flex items-center gap-4 border border-border rounded-lg p-4 bg-white shadow-sm">
+                  <div className="w-28 h-20 rounded-md overflow-hidden flex-shrink-0">
+                    <img src={e.image_url || '/placeholder-event.jpg'} alt={e.title} className="w-full h-full object-cover" />
+                  </div>
+
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-text-base">{e.title}</h3>
+                        <p className="text-sm text-text-muted">{dateStr} • {e.location}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-text-muted">Precio</p>
+                        <p className="text-lg font-bold">{priceLabel}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between">
+                        <div className="text-xs text-text-muted">Código: <span className="font-mono">TICKET-{('000000' + String(e.id)).slice(-6)}</span></div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-md bg-surface flex items-center justify-center text-xs text-text-muted">QR</div>
+                        <a href={`/events/${e.id}`} className="text-sm text-primary hover:underline">Ver evento</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </Layout>
   );
 };

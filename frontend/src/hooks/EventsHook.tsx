@@ -172,7 +172,7 @@ export const useJoinedEvents = () => {
 
       const data = await response.json();
       // Ensure we always store an array
-      setJoinedEvents(Array.isArray(data) ? data : (data ? [data] : []));
+      setJoinedEvents(data.events);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
@@ -186,5 +186,85 @@ export const useJoinedEvents = () => {
     loading,
     error,
     fetchJoinedEvents,
+  };
+};
+
+
+export const useCreatedEvents = () => {
+  const [createdEvents, setCreatedEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCreatedEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:3000/events/created', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch created events: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setCreatedEvents(data.events);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    createdEvents,
+    loading,
+    error,
+    fetchCreatedEvents,
+  };
+};
+
+export const useEventCancellation = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const cancelEvent = useCallback(async (eventId: number): Promise<CancelEventResponse> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:3000/events/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ eventId }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to cancel event: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    cancelEvent,
+    loading,
+    error,
   };
 };

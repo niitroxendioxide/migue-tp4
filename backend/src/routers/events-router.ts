@@ -48,8 +48,9 @@ eventsRouter.post('/join', authMiddleware, async (req, res, next) => {
 
 eventsRouter.get("/joined", authMiddleware, async (req, res, next) => {
     try {
+        
         const joinedEvents = await viewJoinedEvents(req.user.id)
-
+        console.log("Joined events: ", joinedEvents.events);
         res.status(200).json(joinedEvents)
     } catch(err) {
         next(err)
