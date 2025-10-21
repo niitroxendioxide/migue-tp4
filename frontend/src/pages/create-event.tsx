@@ -32,7 +32,7 @@ export const CreateEventPage: React.FC = () => {
   // Redirigir si no está autenticado
   React.useEffect(() => {
     if (!isAuthenticated) {
-      window.location.hash = '#/auth';
+      window.location.hash = '/auth';
     }
   }, [isAuthenticated]);
 
@@ -77,7 +77,7 @@ export const CreateEventPage: React.FC = () => {
       
       // Redirigir al perfil después de un momento
       setTimeout(() => {
-        window.location.hash = '#/profile';
+        window.location.hash = '/profile';
       }, 2000);
 
     } catch (error) {
@@ -277,7 +277,7 @@ export const CreateEventPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-3 pt-6">
               <button
                 type="button"
-                onClick={() => window.location.hash = '#/'}
+                onClick={() => window.location.hash = '/'}
                 className="flex-1 sm:flex-none px-6 py-3 border border-border rounded-md shadow-sm text-sm font-medium text-text-base bg-surface hover:bg-surface-alt focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
               >
                 Cancelar

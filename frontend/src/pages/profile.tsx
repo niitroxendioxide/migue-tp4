@@ -53,6 +53,13 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
   );
 };
 
+// Placeholder for cancelEvent service (replace with real implementation)
+const cancelEvent = async (eventId: string): Promise<boolean> => {
+  console.log('cancelEvent called for', eventId);
+  // TODO: call backend service
+  return true;
+};
+
 const ProfilePage: React.FC = () => {
   const user = useAuthStore.getState().user;
   const isAuthenticated = useAuthStore.getState().isAuthenticated;
@@ -221,7 +228,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-text-dark">Mis Eventos</h2>
               <a
-                href="#/create-event"
+                href="/create-event"
                 className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
               >
                 + Crear Evento

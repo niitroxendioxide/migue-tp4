@@ -11,7 +11,7 @@ export const AuthPage: React.FC = () => {
   // Redirigir si ya está autenticado
   React.useEffect(() => {
     if (isAuthenticated) {
-      window.location.hash = '#/';
+      window.location.hash = '/';
     }
   }, [isAuthenticated]);
   
@@ -82,7 +82,7 @@ export const AuthPage: React.FC = () => {
         if (result.success) {
           setSuccess('¡Inicio de sesión exitoso!');
           setTimeout(() => {
-            window.location.hash = '#/';
+            window.location.hash = '/';
           }, 1000);
         } else {
           setError(result.message || 'Error al iniciar sesión');
@@ -105,7 +105,7 @@ export const AuthPage: React.FC = () => {
         if (result.success) {
           setSuccess('¡Registro exitoso! Redirigiendo...');
           setTimeout(() => {
-            window.location.hash = '#/';
+            window.location.hash = '/';
           }, 1000);
         } else {
           setError('Error al registrarse');
@@ -124,7 +124,7 @@ export const AuthPage: React.FC = () => {
     setAuthMode(newMode);
     
     // Actualizar URL
-    window.location.hash = newMode === 'register' ? '#/auth/register' : '#/auth';
+    window.location.hash = newMode === 'register' ? '/auth/register' : '/auth';
     
     setFormData({
       email: '',
@@ -278,7 +278,7 @@ export const AuthPage: React.FC = () => {
                     </label>
                   </div>
                   <div className="text-sm">
-                    <a href="#" className="text-text-link hover:text-text-link hover:underline">
+                    <a href="/" className="text-text-link hover:text-text-link hover:underline">
                       ¿Olvidaste tu contraseña?
                     </a>
                   </div>

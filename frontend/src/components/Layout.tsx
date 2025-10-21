@@ -13,13 +13,13 @@ interface NavItem {
 
 // Simple placeholder for active nav logic (could be improved with routing later)
 const getNavItems = (isAuthenticated: boolean): NavItem[] => [
-  { label: 'Eventos', href: '/', current: window.location.hash === '#/' || window.location.hash === '' },
+  { label: 'Eventos', href: '/', current: window.location.hash === '/' || window.location.hash === '' },
   ...(isAuthenticated ? [
-    { label: 'Crear Evento', href: '/create-event', current: window.location.hash === '#/create-event' },
+    { label: 'Crear Evento', href: '/create-event', current: window.location.hash === '/create-event' },
     { label: 'Mi Billetera', href: '/wallet', current: window.location.hash === '/wallet' },
-    { label: 'Mi Perfil', href: '/profile', current: window.location.hash === '#/profile' }
+    { label: 'Mi Perfil', href: '/profile', current: window.location.hash === '/profile' }
   ] : []),
-  { label: 'Mis Tickets', href: '/tickets', current: window.location.hash === '#/tickets' }
+  { label: 'Mis Tickets', href: '/tickets', current: window.location.hash === '/tickets' }
 ];
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -52,7 +52,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Branding */}
             <div className="flex items-center gap-2">
             
-              <a href="#/" className="text-xl sm:text-2xl font-extrabold tracking-tight text-text-base flex items-center gap-1 hover:opacity-80 transition-opacity">
+              <a href="/" className="text-xl sm:text-2xl font-extrabold tracking-tight text-text-base flex items-center gap-1 hover:opacity-80 transition-opacity">
                 <span className='text-text-secondary'>Migue</span><span className="text-text-inverse">Eventos</span>
               </a>
             </div>
@@ -79,7 +79,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 // Usuario autenticado
                 <div className="flex items-center gap-3">
                   <a 
-                    href="#/wallet"
+                    href="/wallet"
                     className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white hover:bg-white/20 transition-colors"
                   >
                     <span>💰</span>
@@ -99,13 +99,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 // Usuario no autenticado
                 <>
                   <a 
-                    href="#/auth" 
+                    href="/auth"
                     className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full text-text-base bg-bg shadow hover:shadow-md hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all"
                   >
                     Iniciar Sesión
                   </a>
                   <a 
-                    href="#/auth/register" 
+                    href="/auth/register" 
                     className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full text-text-inverse bg-primary shadow hover:shadow-md hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all"
                   >
                     Registrarse

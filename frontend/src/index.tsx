@@ -7,50 +7,29 @@ import WalletPage from './pages/wallet';
 import TicketsPage from './pages/tickets';
 import ProfilePage from './pages/profile';
 import './index.css';
+import {Routes, Route, BrowserRouter} from 'react-router-dom';
 
 const App: React.FC = () => {
-  // Simple router basado en hash para evitar configuración del servidor
-  const [currentPath, setCurrentPath] = React.useState(window.location.hash.slice(1) || '/');
-
-  React.useEffect(() => {
-    const handleHashChange = () => {
-      setCurrentPath(window.location.hash.slice(1) || '/');
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  // Simple routing
-  const renderPage = () => {
-    switch (true) {
-      case currentPath === '/auth' || currentPath.startsWith('/auth/'):
-        return <AuthPage />;
-      case currentPath === '/create-event':
-        return <CreateEventPage />;
-      case currentPath === '/wallet':
-        return <WalletPage />;
-      case currentPath === '/tickets':
-        return <TicketsPage />;
-      case currentPath === '/profile':
-        return <ProfilePage />;
-      case currentPath === '/':
-      default:
-        return <HomePage />;
-    }
-  };
-
-  return renderPage();
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/create-event" element={<CreateEventPage />} />
+        <Route path="/wallet" element={<WalletPage />} />
+        <Route path="/tickets" element={<TicketsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
 
-root.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
-);
+  </React.StrictMode>,
+)
+
 
 

@@ -26,7 +26,7 @@ export const useEvents = (): UseEventsReturn => {
 
   const getAllEvents = useCallback(async (): Promise<Event[]> => {
     setLoading(true);
-    
+
     try {
       const response = await fetch('http://localhost:3000/events', {
         method: 'GET',
@@ -49,8 +49,8 @@ export const useEvents = (): UseEventsReturn => {
     } finally {
       setLoading(false);
     }
-  }, [ handleError]);
-  
+  }, [handleError]);
+
 
   return {
     events,
@@ -58,7 +58,7 @@ export const useEvents = (): UseEventsReturn => {
     error,
     getAllEvents,
 
-    
+
   };
 };
 
@@ -70,7 +70,7 @@ export const useEventCreation = () => {
   const createEvent = useCallback(async (eventData: CreateEventRequest): Promise<CreateEventResponse> => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('http://localhost:3000/events/create', {
         method: 'POST',
@@ -110,7 +110,7 @@ export const useEventJoin = () => {
   const joinEvent = useCallback(async (eventId: number): Promise<JoinEventResponse> => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('http://localhost:3000/events/join', {
         method: 'POST',
@@ -127,23 +127,64 @@ export const useEventJoin = () => {
 
       return await response.json();
     } catch (err) {
-      
+
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
-      
+
       throw err;
-    
+
     } finally {
       setLoading(false);
     }
   }, []);
 
-  
+
 
   return {
     joinEvent,
     loading,
     error,
 
+  };
+};
+
+export const useJoinedEvents = () => {
+  const [joinedEvents, setJoinedEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchJoinedEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:3000/events/joined', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch joined events: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      // Ensure we always store an array
+      setJoinedEvents(Array.isArray(data) ? data : (data ? [data] : []));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    joinedEvents,
+    loading,
+    error,
+    fetchJoinedEvents,
   };
 };

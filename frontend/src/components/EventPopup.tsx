@@ -203,7 +203,7 @@ export const EventPopup: React.FC<EventPopupProps> = ({
                                     {purchaseError.includes('Saldo insuficiente') && (
                                         <div className="mt-2">
                                             <a
-                                                href="#/wallet"
+                                                href="/wallet"
                                                 className="text-red-600 underline hover:text-red-800"
                                                 onClick={onCancel}
                                             >

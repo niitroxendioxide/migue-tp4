@@ -164,7 +164,7 @@ export const HomePage: React.FC = () => {
       {/* Botón flotante para crear evento (solo si está autenticado) */}
       {isAuthenticated && (
         <a
-          href="#/create-event"
+          href="/create-event"
           className="fixed bottom-6 right-6 bg-primary hover:bg-primary-hover text-text-inverse p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 group"
           title="Crear nuevo evento"
         >
