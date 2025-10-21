@@ -1,5 +1,5 @@
 import { db } from '../db/db'
-import { CreateEventRequest, Event, JoinEventRequest, JoinEventResponse } from '../../../shared/types'
+import { CancelEventResponse, CreateEventRequest, Event, JoinEventRequest, JoinEventResponse } from '../../../shared/types'
 import { BadRequestError, ServerError } from '../middleware/errors'
 
 export async function getAllEvents() {
@@ -187,8 +187,6 @@ export async function viewJoinedEvents(p_UserId: number) {
     }
   })
 
-  console.log(userJoinedEvents)
-
   if (!userJoinedEvents) {
     return {
       success: true,
@@ -201,5 +199,52 @@ export async function viewJoinedEvents(p_UserId: number) {
   return {
     success: true,
     events: userJoinedEvents,
+  }
+}
+
+export async function cancelEvent(p_EventId: number, p_UserId: number): Promise<CancelEventResponse> {
+  if (!p_EventId) {
+    throw new BadRequestError('Event id is required');
+  }
+  
+  const event = await db.event.findUnique({
+    where: {
+      id: p_EventId,
+    },
+  })
+
+  if (!event) {
+    throw new BadRequestError('Event not found');
+  }
+
+  const eventUser = await db.eventUser.findFirst({
+    where: {
+      id_event: event.id,
+      id_user : p_UserId,
+    },
+
+    select: {
+      id: true,
+      id_user: true,
+    }
+  })
+
+  if (!eventUser) {
+    throw new BadRequestError('User is not registered to this event');
+  }
+
+  const removeEventUserResult = await db.eventUser.delete({
+    where: {
+      id: eventUser.id
+    }
+  })
+
+  if (!removeEventUserResult) {
+    throw new ServerError('Error cancelling event');
+  }
+
+  return {
+    success: true,
+    message: 'Event cancelled successfully',
   }
 }
