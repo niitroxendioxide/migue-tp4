@@ -101,6 +101,15 @@ export interface ChargeBalanceResponse {
     newBalance?: number
 }
 
+export interface CancelEventRequest {
+    eventId: number
+}
+
+export interface CancelEventResponse {
+    success: boolean
+    message?: string
+}
+
 export interface ViewJoinedEventsResponse {
     success: boolean,
     events: Event[],
