@@ -1,5 +1,6 @@
 export interface Event {
     id: number
+    id_user: number,
     id_user: number
     title: string
     date: Date | string
@@ -10,6 +11,7 @@ export interface Event {
     price: number
     is_paid: boolean
     is_cancelled: boolean
+    attendees: number
 }
 
 export interface EventUser {
