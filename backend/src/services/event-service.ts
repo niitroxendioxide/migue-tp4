@@ -2,9 +2,24 @@ import { db } from '../db/db'
 import { CancelEventResponse, CreateEventRequest, Event, JoinEventRequest, JoinEventResponse } from '../../../shared/types'
 import { BadRequestError, ServerError } from '../middleware/errors'
 
+async function fillEventsAttendees(p_Events: Event[]) {
+  for (const event of p_Events as Event[]) {
+    const attendees = await db.eventUser.count({
+      where: {
+        id_event: event.id,
+      },
+    })
+
+    event.attendees = attendees
+  }
+
+  return p_Events;
+}
+
 export async function getAllEvents() {
-  const events = await db.event.findMany({
+  const queryevents = await db.event.findMany({
     select: {
+        id_user: true,
         id: true,
         title: true,
         description: true,
@@ -14,7 +29,61 @@ export async function getAllEvents() {
     }
   })
 
+  const events = await fillEventsAttendees(queryevents as Event[])
+
   return events
+}
+
+
+export async function getJoinedEvents(p_UserId: number) {
+  if (!p_UserId) {
+    throw new BadRequestError('User id is required');
+  }
+
+  const userJoinedEvents = await db.eventUser.findMany({
+    where: {
+      id_user: p_UserId,
+    },
+
+    select: {
+      event: true,
+    }
+  })
+
+  if (!userJoinedEvents) {
+    return {
+      success: true,
+      events: [],
+    }
+  }
+
+  return userJoinedEvents;
+}
+
+export async function getCreatedEvents(p_UserId: number) {
+  if (!p_UserId) {
+    throw new BadRequestError('User id is required');
+  }
+
+  const queryevents = await db.event.findMany({
+    where: {
+      id_user: p_UserId,
+    },
+
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      date: true,
+      location: true,
+      image_url: true,
+      price: true,
+    }
+  })
+
+  const userCreatedEvents = await fillEventsAttendees(queryevents as Event[])
+  
+  return userCreatedEvents;
 }
 
 export async function getEventById(p_EventId: number): Promise<Event> {
@@ -23,6 +92,7 @@ export async function getEventById(p_EventId: number): Promise<Event> {
       id: p_EventId,
     },
     select: {
+      id_user: true,
       id: true,
       title: true,
       description: true,
@@ -37,8 +107,15 @@ export async function getEventById(p_EventId: number): Promise<Event> {
     throw new BadRequestError('Event not found');
   }
 
+  const attendees = await db.eventUser.count({
+    where: {
+      id_event: event.id,
+    },
+  })
+
   const event_data = {
     id: event.id,
+    id_user: event.id_user,
     title: event.title,
     description: event.description,
     description_extended: event.description,
@@ -47,13 +124,14 @@ export async function getEventById(p_EventId: number): Promise<Event> {
     image_url: event.image_url,
     is_paid: event.price > 0,
     price: event.price,
+    attendees: attendees,
     is_cancelled: false, // Placeholder, implement cancellation logic if needed
   } as Event;
 
   return event_data;
 }
 
-export async function createEvent(p_EventRequest: CreateEventRequest) {
+export async function createEvent(p_EventRequest: CreateEventRequest & { userId: number }) {
   if (!p_EventRequest.title) {
     throw new BadRequestError('Title is required');
   }
@@ -80,6 +158,7 @@ export async function createEvent(p_EventRequest: CreateEventRequest) {
 
   const event = await db.event.create({
     data: {
+      id_user: p_EventRequest.userId,
       title: p_EventRequest.title,
       description: p_EventRequest.description,
       date: p_EventRequest.date,
@@ -174,32 +253,6 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
     eventUser: eventUser,
     message: 'Event joined successfully',
   } as JoinEventResponse
-}
-
-export async function viewJoinedEvents(p_UserId: number) {
-  const userJoinedEvents = await db.eventUser.findMany({
-    where: {
-      id_user: p_UserId,
-    },
-
-    select: {
-      event: true,
-    }
-  })
-
-  if (!userJoinedEvents) {
-    return {
-      success: true,
-      events: [],
-    }
-  }
-
-  
-
-  return {
-    success: true,
-    events: userJoinedEvents,
-  }
 }
 
 export async function cancelEvent(p_EventId: number, p_UserId: number): Promise<CancelEventResponse> {
