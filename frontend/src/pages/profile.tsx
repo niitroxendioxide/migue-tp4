@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
 import { useAuthStore } from '../authStore/authStore';
+import { useCreatedEvents } from '../hooks/EventsHook';
+import { X } from 'lucide-react';
 interface CancelEventModalProps {
   isOpen: boolean;
   eventTitle: string;
-  onConfirm: () => void;
+  onConfirm: (eventId: number) => void;
   onCancel: () => void;
   loading: boolean;
+  eventId: number;
 }
 
 const CancelEventModal: React.FC<CancelEventModalProps> = ({ 
@@ -14,7 +17,8 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
   eventTitle, 
   onConfirm, 
   onCancel, 
-  loading 
+  loading,
+  eventId
 }) => {
   if (!isOpen) return null;
 
@@ -41,7 +45,7 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
             No, mantener evento
           </button>
           <button
-            onClick={onConfirm}
+            onClick={() => onConfirm(eventId)}
             className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
             disabled={loading}
           >
@@ -54,7 +58,7 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
 };
 
 // Placeholder for cancelEvent service (replace with real implementation)
-const cancelEvent = async (eventId: string): Promise<boolean> => {
+const cancelEvent = async (eventId: number): Promise<boolean> => {
   console.log('cancelEvent called for', eventId);
   // TODO: call backend service
   return true;
@@ -64,14 +68,10 @@ const ProfilePage: React.FC = () => {
   const user = useAuthStore.getState().user;
   const isAuthenticated = useAuthStore.getState().isAuthenticated;
   const balance = useAuthStore.getState().user?.balance ?? 0;
-  const createdEvents = [
-    // Mock data for created events
-    { id: '1', title: 'Concierto de Rock', date: '2024-09-15T20:00:00Z', location: 'Auditorio Nacional', is_paid: true, price: 50.00, attendees: 150, is_cancelled: false, description: 'Un increíble concierto de rock con bandas locales.', image_url: '' },
-  ];
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'cancelled'>('upcoming');
-  const [cancelModal, setCancelModal] = useState<{ isOpen: boolean; eventId: string; eventTitle: string }>({
+  const {createdEvents, loading,error, fetchCreatedEvents} = useCreatedEvents(); // Placeholder, replace with actual data fetching if needed
+  const [cancelModal, setCancelModal] = useState<{ isOpen: boolean; eventId: number; eventTitle: string }>({
     isOpen: false,
-    eventId: '',
+    eventId: 0,
     eventTitle: ''
   });
   const [cancelLoading, setCancelLoading] = useState(false);
@@ -80,6 +80,9 @@ const ProfilePage: React.FC = () => {
     window.location.hash = '/auth';
     return null;
   }
+  useEffect(() => {
+    fetchCreatedEvents();
+  }, [fetchCreatedEvents]);
 
 
 
@@ -88,7 +91,7 @@ const ProfilePage: React.FC = () => {
     try {
       const success = await cancelEvent(cancelModal.eventId);
       if (success) {
-        setCancelModal({ isOpen: false, eventId: '', eventTitle: '' });
+        setCancelModal({ isOpen: false, eventId: 0, eventTitle: '' });
         // Optionally show success message
       }
     } catch (error) {
@@ -213,7 +216,7 @@ const ProfilePage: React.FC = () => {
               <div>
                 <p className="text-text-muted text-sm">Total Asistentes</p>
                 <p className="font-bold text-lg">
-                  {createdEvents.reduce((sum, event) => sum + (event.attendees || 0), 0)}
+                  {createdEvents.reduce((sum, event) => sum + (event.id_user || 0), 0)}
                 </p>
               </div>
             </div>
@@ -234,6 +237,19 @@ const ProfilePage: React.FC = () => {
                 + Crear Evento
               </a>
             </div>
+            {createdEvents.length === 0 && !loading ? (
+              <p className="text-text-muted mt-4">No has creado ningún evento aún.</p>
+            ) : (
+              <div className="space-y-4">
+                {createdEvents.map((event) => (
+                  <div key={event.id}  className="border-b border-gray-200 py-4">
+                    <h3 className="text-lg font-semibold">{event.title}</h3>
+                    <p className="text-sm text-text-muted">{new Date(event.date).toLocaleDateString('es-ES')}</p>
+                    <X className="h-4 w-4 text-red-600 cursor-pointer" onClick={() => setCancelModal({ isOpen: true, eventId: event.id, eventTitle: event.title })} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
 
@@ -245,8 +261,9 @@ const ProfilePage: React.FC = () => {
       <CancelEventModal
         isOpen={cancelModal.isOpen}
         eventTitle={cancelModal.eventTitle}
+        eventId={cancelModal.eventId}
         onConfirm={handleCancelEvent}
-        onCancel={() => setCancelModal({ isOpen: false, eventId: '', eventTitle: '' })}
+        onCancel={() => setCancelModal({ isOpen: false, eventId: 0, eventTitle: '' })}
         loading={cancelLoading}
       />
     </Layout>

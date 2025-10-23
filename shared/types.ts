@@ -1,5 +1,6 @@
 export interface Event {
     id: number
+    id_user: number
     title: string
     date: Date | string
     description: string
@@ -80,6 +81,7 @@ export interface JoinEventResponse {
 
 export interface CreateEventRequest {
     title: string
+    id_user: number
     description: string
     date: string
     location: string

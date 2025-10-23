@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuthStore } from '../authStore/authStore';
+import { useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,19 +8,18 @@ interface LayoutProps {
 
 interface NavItem {
   label: string;
-  href: string;
-  current: boolean;
+  path: string;
 }
 
 // Simple placeholder for active nav logic (could be improved with routing later)
 const getNavItems = (isAuthenticated: boolean): NavItem[] => [
-  { label: 'Eventos', href: '/', current: window.location.hash === '/' || window.location.hash === '' },
+  { label: 'Eventos', path: '/' },
   ...(isAuthenticated ? [
-    { label: 'Crear Evento', href: '/create-event', current: window.location.hash === '/create-event' },
-    { label: 'Mi Billetera', href: '/wallet', current: window.location.hash === '/wallet' },
-    { label: 'Mi Perfil', href: '/profile', current: window.location.hash === '/profile' }
+    { label: 'Crear Evento', path: '/create-event' },
+    { label: 'Mi Billetera', path: '/wallet' },
+    { label: 'Mi Perfil', path: '/profile' },
+    { label: 'Mis Tickets', path: '/tickets' }
   ] : []),
-  { label: 'Mis Tickets', href: '/tickets', current: window.location.hash === '/tickets' }
 ];
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -27,7 +27,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isAuthenticated = useAuthStore.getState().isAuthenticated;
   const balance =  useAuthStore.getState().user?.balance ?? 0;
   const loading = false; // Replace with actual loading state
-  const logout = useAuthStore.getState().logout;
+  const { setAuthState } = useAuthStore();
+  const handleLogout = () => {
+  useAuthStore.getState().logout();
+  navigate('/');
+};
+  const navigate = useNavigate();
   
   const navItems = getNavItems(isAuthenticated);
 
@@ -59,19 +64,25 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-2">
-              {navItems.map((item: NavItem) => (
-                <a
+            {navItems.map((item: NavItem) => {
+              const isCurrent = location.pathname === item.path;
+              
+              return (
+                <button
                   key={item.label}
-                  href={item.href}
-                  className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 hover:text-white ${item.current ? 'text-white underline' : 'text-gray-300'} group`}
+                  onClick={() => navigate(item.path)}
+                  className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 hover:text-white ${
+                    isCurrent ? 'text-white' : 'cursor-pointer text-gray-300'
+                  } group`}
                 >
                   {item.label}
-                  {item.current && (
-                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-6 bg-secondary rounded-full"></span>
+                  {isCurrent && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-6 bg-secondary rounded-full"></span>
                   )}
-                </a>
-              ))}
-            </nav>
+                </button>
+              );
+            })}
+          </nav>
 
             {/* Actions */}
             <div className="flex items-center gap-3">
@@ -89,7 +100,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     Hola, {user?.name || user?.full_name || user?.email.split('@')[0]}
                   </span>
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full text-text-base bg-bg shadow hover:shadow-md hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all"
                   >
                     Cerrar Sesión
@@ -99,14 +110,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 // Usuario no autenticado
                 <>
                   <a 
+                  onClick={() => setAuthState('login')}
                     href="/auth"
                     className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full text-text-base bg-bg shadow hover:shadow-md hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all"
                   >
                     Iniciar Sesión
                   </a>
                   <a 
-                    href="/auth/register" 
+                    onClick={() => setAuthState('register')}
+                    href="/auth" 
                     className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full text-text-inverse bg-primary shadow hover:shadow-md hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-[.98] transition-all"
+                  
                   >
                     Registrarse
                   </a>
