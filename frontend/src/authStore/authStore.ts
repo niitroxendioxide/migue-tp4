@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '../types';
+import { AuthMode } from '../pages/auth';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -11,11 +12,15 @@ interface AuthState {
     clear: () => void;
     isAuthenticated: boolean;
     logout: () => void;
+    authState: AuthMode;
+    setAuthState: (mode: AuthMode) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
     persist((set): AuthState => ({
-        user: null,
+        user: null, 
+        authState: 'login',
+        setAuthState: (mode: AuthMode) => set({ authState: mode }),
         setUser: (u: User | null) => set({ user: u, isAuthenticated: u !== null }),
         updateBalance: (balance: number) => set((state) => ({ user: state.user ? { ...state.user, balance } : state.user })),
         clear: () => set({ user: null, isAuthenticated: false }),
@@ -24,8 +29,6 @@ export const useAuthStore = create<AuthState>()(
         logout: () => set(() => {
             console.log('Logging out...');
             localStorage.removeItem('authToken');
-            const navigate = useNavigate();
-            navigate('/');
             return { user: null, isAuthenticated: false };
         }),
     }), {

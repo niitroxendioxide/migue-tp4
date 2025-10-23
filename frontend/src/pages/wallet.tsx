@@ -1,7 +1,6 @@
 import React, { use, useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
 import { useBalanceCharge } from '../hooks/BalanceHook';
-import { useAuth } from '../hooks/AuthHookOLD';
 import { useAuthStore } from '../authStore/authStore';
 interface TopUpModalProps {
   isOpen: boolean;
@@ -135,7 +134,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
 };
 
 const WalletPage: React.FC = () => {
-  const user = { email: 'user@example.com' };
+  const user = useAuthStore.getState().user;
   const isAuthenticated = true; // Replace with actual authentication logic
   const loading = false; // Replace with actual loading state
   const [showTopUpModal, setShowTopUpModal] = useState(false);

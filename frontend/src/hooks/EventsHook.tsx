@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Event, EventUser } from '../../../shared/types';
-import { CreateEventRequest, CreateEventResponse, JoinEventRequest, JoinEventResponse } from '../../../shared/types';
+import {  CancelEventResponse, Event, EventUser,CreateEventRequest, CreateEventResponse, JoinEventRequest, JoinEventResponse } from '../../../shared/types';
 interface UseEventsReturn {
   events: Event[];
   loading: boolean;
@@ -211,8 +210,9 @@ export const useCreatedEvents = () => {
       if (!response.ok) {
         throw new Error(`Failed to fetch created events: ${response.statusText}`);
       }
-
+     
       const data = await response.json();
+      console.log('Fetched created events:', data);
       setCreatedEvents(data.events);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';

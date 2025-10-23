@@ -1,6 +1,8 @@
 import React, { use, useState } from 'react';
 import { Layout } from '../components/Layout';
 import { useEventCreation, useEvents } from '../hooks/EventsHook';
+import { useAuthStore } from '../authStore/authStore';
+import { useNavigate } from 'react-router-dom';
 
 interface EventFormData {
   title: string;
@@ -14,10 +16,12 @@ interface EventFormData {
 }
 
 export const CreateEventPage: React.FC = () => {
-  const isAuthenticated = true;
+  const isAuthenticated = useAuthStore.getState().isAuthenticated;
+  const user = useAuthStore.getState().user;
   const { createEvent, loading: eventsLoading } = useEventCreation();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<EventFormData>({
     title: '',
     description: '',
@@ -32,7 +36,7 @@ export const CreateEventPage: React.FC = () => {
   // Redirigir si no está autenticado
   React.useEffect(() => {
     if (!isAuthenticated) {
-      window.location.hash = '/auth';
+      navigate('/auth');
     }
   }, [isAuthenticated]);
 
@@ -63,6 +67,7 @@ export const CreateEventPage: React.FC = () => {
       
       // Crear evento usando el contexto
       const eventId = await createEvent({
+        id_user: user!.id,
         title: formData.title,
         description: formData.description,
         date: eventDateTime.toISOString(),
@@ -77,7 +82,7 @@ export const CreateEventPage: React.FC = () => {
       
       // Redirigir al perfil después de un momento
       setTimeout(() => {
-        window.location.hash = '/profile';
+        navigate('/profile');
       }, 2000);
 
     } catch (error) {

@@ -2,6 +2,7 @@ import React, { use, useState } from 'react';
 import { useEventJoin } from '../hooks/EventsHook';
 import { Event } from '../types/index';
 import { useAuthStore } from '../authStore/authStore';
+import { useNavigate } from 'react-router-dom';
 
 interface EventPopupProps extends Event {
     onConfirm: () => void;
@@ -36,9 +37,11 @@ export const EventPopup: React.FC<EventPopupProps> = ({
     const needsPayment = Boolean(is_paid && price && price > 0);
     const isEventFree = Boolean(!is_paid || price === 0);
     const userIsAttending = isAttending(eventId);
+    const navigate = useNavigate();
+
     const handleAction = async () => {
         if (!isAuthenticated) {
-            window.location.hash = '/auth';
+            navigate('/auth');
             return;
         }
 
