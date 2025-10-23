@@ -80,6 +80,7 @@ export async function createEvent(p_EventRequest: CreateEventRequest) {
 
   const event = await db.event.create({
     data: {
+      id_user: p_EventRequest.id_user,
       title: p_EventRequest.title,
       description: p_EventRequest.description,
       date: p_EventRequest.date,
@@ -94,6 +95,16 @@ export async function createEvent(p_EventRequest: CreateEventRequest) {
   }
 
   return event
+}
+
+export async function getCreatedEvents(p_UserId: number) {
+  const createdEvents = await db.event.findMany({
+    where: {
+      id_user: p_UserId,
+    },
+  })
+
+  return createdEvents
 }
 
 export async function joinEvent(p_EventId: number, p_UserId: number): Promise<JoinEventResponse> {

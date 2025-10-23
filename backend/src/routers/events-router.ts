@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { CancelEventRequest, CreateEventRequest, JoinEventRequest } from '../../../shared/types'
-import { getAllEvents, createEvent, joinEvent, getEventById, viewJoinedEvents, cancelEvent } from '../services/event-service'
+import { getAllEvents, createEvent, joinEvent, getEventById, viewJoinedEvents, cancelEvent, getCreatedEvents } from '../services/event-service'
 import { authMiddleware } from '../middleware/auth'
 import { ServerError } from '../middleware/errors'
 
@@ -23,6 +23,15 @@ eventsRouter.post('/create', authMiddleware, async (req, res, next) => {
         const event = await createEvent(body);
 
         res.status(200).json(event);
+    } catch(error) {
+        next(error);
+    }
+})
+
+eventsRouter.get('/created', authMiddleware, async (req, res, next) => {
+    try {
+        const createdEvents = await getCreatedEvents(req.user.id);
+        res.status(200).json(createdEvents);
     } catch(error) {
         next(error);
     }
