@@ -218,7 +218,7 @@ const ProfilePage: React.FC = () => {
               <div>
                 <p className="text-text-muted text-sm">Total Asistentes</p>
                 <p className="font-bold text-lg">
-                  {createdEvents.reduce((sum, event) => sum + (event.id_user || 0), 0)}
+                  {createdEvents.reduce((sum, event) => sum + (event.attendees || 0), 0)}
                 </p>
               </div>
             </div>
@@ -282,7 +282,7 @@ const ProfilePage: React.FC = () => {
                         <p className="text-sm text-text-muted mb-2">📍 {event.location}</p>
                         <div className="flex items-center gap-4 text-sm text-text-muted">
                           <span>👥 {event.attendees || 0} asistentes</span>
-                          {event.is_paid ? (
+                          {event.price ? (
                             <span>💰 ${event.price?.toFixed(2) || '0.00'}</span>
                           ) : (
                             <span>🎟️ Gratis</span>

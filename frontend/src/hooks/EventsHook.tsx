@@ -41,6 +41,7 @@ export const useEvents = (): UseEventsReturn => {
 
       const eventsData = await response.json();
       setEvents(eventsData);
+      console.log(eventsData);
       return eventsData;
     } catch (err) {
       handleError(err);
@@ -170,8 +171,9 @@ export const useJoinedEvents = () => {
       }
 
       const data = await response.json();
+      console.log('Fetched joined events:', data);
       // Ensure we always store an array
-      setJoinedEvents(data.events);
+      setJoinedEvents(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);

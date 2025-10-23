@@ -64,7 +64,7 @@ const TicketsPage: React.FC = () => {
               const e = (joined as any).event || joined;
               const dateObj = new Date(e.date);
               const dateStr = dateObj.toLocaleString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-              const priceLabel = !e.is_paid ? 'Gratis' : `$${(e.price ?? 0).toFixed(2)}`;
+              const priceLabel = !e.price ? 'Gratis' : `$${(e.price ?? 0).toFixed(2)}`;
 
               return (
                 <div key={e.id ?? idx} className="flex items-center gap-4 border border-border rounded-lg p-4 bg-white shadow-sm">

@@ -23,8 +23,8 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
   });
   const shortTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-  const priceLabel = !event.is_paid ? 'Free' : `$${event.price.toFixed(0)}`;
-  const isFree = !event.is_paid;
+  const priceLabel = event.price <= 0 ? 'Free' : `$${event.price.toFixed(0)}`;
+  const isFree = event.price <= 0;
 
   return (
     <div

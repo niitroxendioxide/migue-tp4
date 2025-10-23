@@ -38,10 +38,10 @@ export const HomePage: React.FC = () => {
     // Apply category filter
     switch (selectedFilter) {
       case 'paid':
-        filtered = filtered.filter(event => event.is_paid);
+        filtered = filtered.filter(event => event.price);
         break;
       case 'free':
-        filtered = filtered.filter(event => !event.is_paid);
+        filtered = filtered.filter(event => !event.attendees);
         break;
       case 'upcoming':
         filtered = filtered.filter(event => new Date(event.date) > new Date());
@@ -111,7 +111,7 @@ export const HomePage: React.FC = () => {
           </div>
           <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
             <div className="text-3xl font-extrabold text-success mb-2">
-              {events.filter(e => !e.is_paid).length}
+              {events.filter(e => !e.attendees).length}
             </div>
             <div className="text-text-soft font-medium">Free Events</div>
           </div>

@@ -1,6 +1,7 @@
 import { db } from "../db/db";
 import { User, type LoginRequest, type LoginResponse, type RegisterRequest, type RegisterResponse } from "../../../shared/types";
 import { BadRequestError, NotFoundError } from "../middleware/errors";
+import { generateToken } from "../middleware/auth";
 
 
 // helpers
@@ -8,7 +9,7 @@ async function createNewToken(p_User: User): Promise<string> {
     const token = await db.tokens.create({
         data: {
             userId: p_User.id,
-            token: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+            token: generateToken(),
             expiresAt: new Date(Date.now() + 3600 * 1000),
         },
 

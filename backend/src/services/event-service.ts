@@ -24,6 +24,7 @@ export async function getAllEvents() {
         title: true,
         description: true,
         date: true,
+        price: true,
         location: true,
         image_url: true,
     }

@@ -18,7 +18,6 @@ export const EventPopup: React.FC<EventPopupProps> = ({
     location,
     image_url,
     price,
-    is_paid,
     is_cancelled,
     onConfirm,
     onCancel,
@@ -33,9 +32,9 @@ export const EventPopup: React.FC<EventPopupProps> = ({
     const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
     const eventId = id;
-    const canAfford = !is_paid || (price ? balance >= price : true);
-    const needsPayment = Boolean(is_paid && price && price > 0);
-    const isEventFree = Boolean(!is_paid || price === 0);
+    const canAfford = !price || (price ? balance >= price : true);
+    const needsPayment = Boolean(price && price > 0);
+    const isEventFree = Boolean(!price || price === 0);
     const userIsAttending = isAttending(eventId);
     const navigate = useNavigate();
 
@@ -171,8 +170,8 @@ export const EventPopup: React.FC<EventPopupProps> = ({
 
                         <div className="flex items-start gap-3">
                             <span className="text-sm font-medium min-w-20 text-text-muted">Price:</span>
-                            <span className={`text-sm font-semibold ${is_paid ? 'text-text-danger' : ' text-text-success'}`}>
-                                {is_paid ? `$${price?.toFixed(2)}` : 'Free'}
+                            <span className={`text-sm font-semibold ${price ? 'text-text-danger' : ' text-text-success'}`}>
+                                {price ? `$${price?.toFixed(2)}` : 'Free'}
                             </span>
                         </div>
                     </div>
