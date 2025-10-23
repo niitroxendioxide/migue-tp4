@@ -213,7 +213,7 @@ export const useCreatedEvents = () => {
      
       const data = await response.json();
       console.log('Fetched created events:', data);
-      setCreatedEvents(data.events);
+      setCreatedEvents(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);

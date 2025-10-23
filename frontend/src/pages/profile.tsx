@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout';
 import { useAuthStore } from '../authStore/authStore';
 import { useCreatedEvents } from '../hooks/EventsHook';
 import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 interface CancelEventModalProps {
   isOpen: boolean;
   eventTitle: string;
@@ -12,11 +13,11 @@ interface CancelEventModalProps {
   eventId: number;
 }
 
-const CancelEventModal: React.FC<CancelEventModalProps> = ({ 
-  isOpen, 
-  eventTitle, 
-  onConfirm, 
-  onCancel, 
+const CancelEventModal: React.FC<CancelEventModalProps> = ({
+  isOpen,
+  eventTitle,
+  onConfirm,
+  onCancel,
   loading,
   eventId
 }) => {
@@ -68,16 +69,17 @@ const ProfilePage: React.FC = () => {
   const user = useAuthStore.getState().user;
   const isAuthenticated = useAuthStore.getState().isAuthenticated;
   const balance = useAuthStore.getState().user?.balance ?? 0;
-  const {createdEvents, loading,error, fetchCreatedEvents} = useCreatedEvents(); // Placeholder, replace with actual data fetching if needed
+  const { createdEvents, loading, error, fetchCreatedEvents } = useCreatedEvents(); // Placeholder, replace with actual data fetching if needed
   const [cancelModal, setCancelModal] = useState<{ isOpen: boolean; eventId: number; eventTitle: string }>({
     isOpen: false,
     eventId: 0,
     eventTitle: ''
   });
+  const navigate = useNavigate();
   const [cancelLoading, setCancelLoading] = useState(false);
 
   if (!isAuthenticated) {
-    window.location.hash = '/auth';
+    navigate('/auth');
     return null;
   }
   useEffect(() => {
@@ -155,7 +157,7 @@ const ProfilePage: React.FC = () => {
             <span>🎟️ Gratis</span>
           )}
         </div>
-        
+
         {showCancelButton && !event.is_cancelled && (
           <button
             onClick={() => setCancelModal({
@@ -207,7 +209,7 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          
+
           <div className="bg-white p-4 rounded-lg border border-gray-200">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -222,7 +224,7 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          
+
         </div>
 
         {/* Gestión de eventos creados */}
@@ -237,15 +239,71 @@ const ProfilePage: React.FC = () => {
                 + Crear Evento
               </a>
             </div>
-            {createdEvents.length === 0 && !loading ? (
+            {loading ? (
+              <div className="space-y-4 mt-4">
+                {[...Array(2)].map((_, idx) => (
+                  <div key={idx} className="border rounded-lg p-4 animate-pulse">
+                    <div className="h-5 bg-gray-200 rounded w-2/3 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                  </div>
+                ))}
+              </div>
+            ) : createdEvents.length === 0 ? (
               <p className="text-text-muted mt-4">No has creado ningún evento aún.</p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 mt-4">
                 {createdEvents.map((event) => (
-                  <div key={event.id}  className="border-b border-gray-200 py-4">
-                    <h3 className="text-lg font-semibold">{event.title}</h3>
-                    <p className="text-sm text-text-muted">{new Date(event.date).toLocaleDateString('es-ES')}</p>
-                    <X className="h-4 w-4 text-red-600 cursor-pointer" onClick={() => setCancelModal({ isOpen: true, eventId: event.id, eventTitle: event.title })} />
+                  <div
+                    key={event.id}
+                    className={`border rounded-lg p-4 transition-all hover:shadow-md ${event.is_cancelled ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'
+                      }`}
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className={`text-lg font-semibold ${event.is_cancelled ? 'text-red-600' : 'text-text-dark'
+                            }`}>
+                            {event.title}
+                          </h3>
+                          {event.is_cancelled && (
+                            <span className="px-2 py-1 bg-red-200 text-red-800 text-xs rounded-full font-medium">
+                              CANCELADO
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-text-muted mb-1">
+                          📅 {new Date(event.date).toLocaleDateString('es-ES', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </p>
+                        <p className="text-sm text-text-muted mb-2">📍 {event.location}</p>
+                        <div className="flex items-center gap-4 text-sm text-text-muted">
+                          <span>👥 {event.attendees || 0} asistentes</span>
+                          {event.is_paid ? (
+                            <span>💰 ${event.price?.toFixed(2) || '0.00'}</span>
+                          ) : (
+                            <span>🎟️ Gratis</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {!event.is_cancelled && (
+                        <button
+                          onClick={() => setCancelModal({
+                            isOpen: true,
+                            eventId: event.id,
+                            eventTitle: event.title
+                          })}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Cancelar evento"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -253,7 +311,7 @@ const ProfilePage: React.FC = () => {
           </div>
 
 
-          
+
         </div>
       </div>
 
