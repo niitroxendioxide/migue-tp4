@@ -30,7 +30,7 @@ model User {
     id          Int      @id @default(autoincrement())
     id_user     Int
     creator     User     @relation(fields: [id_user], references: [id])
-
+    is_cancelled Boolean  @default(false)
     title       String
     date        DateTime @default(now())
     description String

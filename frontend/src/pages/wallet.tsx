@@ -2,6 +2,7 @@ import React, { use, useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
 import { useBalanceCharge } from '../hooks/BalanceHook';
 import { useAuthStore } from '../authStore/authStore';
+import { useNavigate } from 'react-router-dom';
 interface TopUpModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -138,10 +139,10 @@ const WalletPage: React.FC = () => {
   const isAuthenticated = true; // Replace with actual authentication logic
   const loading = false; // Replace with actual loading state
   const [showTopUpModal, setShowTopUpModal] = useState(false);
-  const balance = useAuthStore.getState().user?.balance ?? 0;
+  const navigate = useNavigate();
+  const balance = useAuthStore((state) => state.user?.balance ?? 0);
   if (!isAuthenticated) {
-    window.location.hash = '/auth';
-    return null;
+    navigate("/auth")
   }
 
   return (

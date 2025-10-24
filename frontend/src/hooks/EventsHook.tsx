@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import {  CancelEventResponse, Event, EventUser,CreateEventRequest, CreateEventResponse, JoinEventRequest, JoinEventResponse } from '../../../shared/types';
+import {  UnJoinEventResponse, Event, EventUser,CreateEventRequest, CreateEventResponse, JoinEventRequest, JoinEventResponse } from '../../../shared/types';
+import { useAuthStore } from '../authStore/authStore';
 interface UseEventsReturn {
   events: Event[];
   loading: boolean;
@@ -82,7 +83,9 @@ export const useEventCreation = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to create event: ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.message || errorData.error || response.statusText;
+        throw new Error(errorMessage);
       }
 
       return await response.json();
@@ -122,10 +125,13 @@ export const useEventJoin = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to join event: ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.message || errorData.error || response.statusText;
+        throw new Error(errorMessage);
       }
-
-      return await response.json();
+      const data = await response.json();
+      useAuthStore.getState().updateBalance(data.newBalance);
+      return data;
     } catch (err) {
 
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -167,7 +173,9 @@ export const useJoinedEvents = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch joined events: ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.message || errorData.error || response.statusText;
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -210,7 +218,9 @@ export const useCreatedEvents = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch created events: ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.message || errorData.error || response.statusText;
+        throw new Error(errorMessage);
       }
      
       const data = await response.json();
@@ -236,7 +246,7 @@ export const useEventCancellation = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cancelEvent = useCallback(async (eventId: number): Promise<CancelEventResponse> => {
+  const cancelEvent = useCallback(async (eventId: number): Promise<UnJoinEventResponse> => {
     setLoading(true);
     setError(null);
 
@@ -251,7 +261,9 @@ export const useEventCancellation = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to cancel event: ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.message || errorData.error || response.statusText;
+        throw new Error(errorMessage);
       }
 
       return await response.json();
@@ -266,6 +278,47 @@ export const useEventCancellation = () => {
 
   return {
     cancelEvent,
+    loading,
+    error,
+  };
+};
+
+export const useEventUnjoin = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const unjoinEvent = useCallback(async (eventId: number): Promise<UnJoinEventResponse> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:3000/events/unjoin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ eventId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage = errorData.message || errorData.error || response.statusText;
+        throw new Error(errorMessage);
+      }
+
+      return await response.json();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    unjoinEvent,
     loading,
     error,
   };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
 import { useAuthStore } from '../authStore/authStore';
-import { useCreatedEvents } from '../hooks/EventsHook';
+import { useCreatedEvents, useEventCancellation } from '../hooks/EventsHook';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 interface CancelEventModalProps {
@@ -24,7 +24,7 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div onClick={onCancel} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl p-6 w-full max-w-md">
         <div className="text-center">
           <div className="text-4xl mb-4">⚠️</div>
@@ -58,17 +58,13 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
   );
 };
 
-// Placeholder for cancelEvent service (replace with real implementation)
-const cancelEvent = async (eventId: number): Promise<boolean> => {
-  console.log('cancelEvent called for', eventId);
-  // TODO: call backend service
-  return true;
-};
+
 
 const ProfilePage: React.FC = () => {
   const user = useAuthStore.getState().user;
   const isAuthenticated = useAuthStore.getState().isAuthenticated;
   const balance = useAuthStore.getState().user?.balance ?? 0;
+  const {cancelEvent, loading: loadingCancel, error: errorCancel} = useEventCancellation();
   const { createdEvents, loading, error, fetchCreatedEvents } = useCreatedEvents(); // Placeholder, replace with actual data fetching if needed
   const [cancelModal, setCancelModal] = useState<{ isOpen: boolean; eventId: number; eventTitle: string }>({
     isOpen: false,

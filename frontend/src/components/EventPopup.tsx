@@ -70,7 +70,8 @@ export const EventPopup: React.FC<EventPopupProps> = ({
             }
 
         } catch (error) {
-            setPurchaseError('Error al procesar la acción. Intenta nuevamente.');
+            console.log('Error processing action:', error);
+            setPurchaseError('Error al procesar la acción: ' + (error instanceof Error ? error.message : ''));
         } 
     };    // Close on ESC and lock background scroll while modal is open
     React.useEffect(() => {

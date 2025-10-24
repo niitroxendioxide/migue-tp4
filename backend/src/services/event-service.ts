@@ -1,5 +1,5 @@
 import { db } from '../db/db'
-import { CancelEventResponse, CreateEventRequest, Event, JoinEventRequest, JoinEventResponse } from '../../../shared/types'
+import { UnJoinEventResponse, CreateEventRequest, Event, JoinEventRequest, JoinEventResponse, CancelEventResponse } from '../../../shared/types'
 import { BadRequestError, ServerError } from '../middleware/errors'
 
 async function fillEventsAttendees(p_Events: Event[]) {
@@ -21,6 +21,7 @@ export async function getAllEvents() {
     select: {
         id_user: true,
         id: true,
+        is_cancelled: true,
         title: true,
         description: true,
         date: true,
@@ -76,6 +77,7 @@ export async function getCreatedEvents(p_UserId: number) {
       title: true,
       description: true,
       date: true,
+      is_cancelled: true,
       location: true,
       image_url: true,
       price: true,
@@ -98,6 +100,7 @@ export async function getEventById(p_EventId: number): Promise<Event> {
       title: true,
       description: true,
       date: true,
+      is_cancelled: true,
       location: true,
       image_url: true,
       price: true,
@@ -126,7 +129,7 @@ export async function getEventById(p_EventId: number): Promise<Event> {
     is_paid: event.price > 0,
     price: event.price,
     attendees: attendees,
-    is_cancelled: false, // Placeholder, implement cancellation logic if needed
+    is_cancelled: event.is_cancelled,
   } as Event;
 
   return event_data;
@@ -180,6 +183,7 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
   const event = await db.event.findUnique({
     where: {
       id: p_EventId,
+      is_cancelled: false,
     },
 
     select: {
@@ -256,10 +260,43 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
     success: true,
     eventUser: eventUser,
     message: 'Event joined successfully',
+    newBalance: updateBalanceResult.balance,
   } as JoinEventResponse
 }
 
 export async function cancelEvent(p_EventId: number, p_UserId: number): Promise<CancelEventResponse> {
+  if (!p_EventId) {
+    throw new BadRequestError('Event id is required');
+  }
+
+  const event = await db.event.findUnique({
+    where: {
+      id: p_EventId,
+    },
+  })
+
+  if (event?.id_user !== p_UserId) {
+    throw new BadRequestError('Only the event creator can cancel the event');
+  }
+
+  const canceledEvent = await db.event.update({
+    where: {
+      id: p_EventId,
+    },
+    data: {
+      is_cancelled: true,
+    },
+  })
+
+  if (!canceledEvent) {
+    throw new ServerError('Error cancelling event');
+  }
+
+  return {success: true, message: 'Event cancelled successfully' };
+
+}
+
+export async function unJoinEvent(p_EventId: number, p_UserId: number): Promise<UnJoinEventResponse> {
   if (!p_EventId) {
     throw new BadRequestError('Event id is required');
   }
@@ -302,6 +339,6 @@ export async function cancelEvent(p_EventId: number, p_UserId: number): Promise<
 
   return {
     success: true,
-    message: 'Event cancelled successfully',
+    message: 'Event unjoined successfully',
   }
 }

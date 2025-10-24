@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { CancelEventRequest, CreateEventRequest, JoinEventRequest } from '../../../shared/types'
-import { getAllEvents, createEvent, joinEvent, getEventById, getCreatedEvents, cancelEvent, getJoinedEvents } from '../services/event-service'
+import { UnJoinEventRequest, CreateEventRequest, JoinEventRequest, CancelEventRequest } from '../../../shared/types'
+import { getAllEvents, createEvent, joinEvent, getEventById, getCreatedEvents, unJoinEvent, getJoinedEvents, cancelEvent } from '../services/event-service'
 import { authMiddleware } from '../middleware/auth'
 import { BadRequestError, ServerError } from '../middleware/errors'
 
@@ -65,16 +65,33 @@ eventsRouter.get("/joined", authMiddleware, async (req, res, next) => {
     }
 })
 
-eventsRouter.post('/cancel', authMiddleware, async (req, res, next) => {
+eventsRouter.post('/unjoin', authMiddleware, async (req, res, next) => {
     try {
-        const body = req.body as CancelEventRequest;
-        const response = await cancelEvent(body.eventId, req.user.id);
+        const body = req.body as UnJoinEventRequest;
+        const response = await unJoinEvent(body.eventId, req.user.id);
 
         res.status(200).json(response);
 
     } catch(error) {
         next(error);
     }
+})
+
+eventsRouter.post("/cancel", authMiddleware, async (req, res, next) => {
+    try {
+        const body = req.body as CancelEventRequest;
+        if (!body.eventId) {
+            throw new BadRequestError('Malformed JSON: Event id is required');
+        }
+        console.log("Cancel event req: ", body);
+
+        const response = await cancelEvent(body.eventId, req.user.id);
+        res.status(200).json(response);
+
+    } catch(error) {
+        next(error);
+    }
+
 })
 
 eventsRouter.get('/:id', authMiddleware, async (req, res, next) => {

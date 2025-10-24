@@ -41,9 +41,9 @@ export const HomePage: React.FC = () => {
         filtered = filtered.filter(event => event.price);
         break;
       case 'free':
-        filtered = filtered.filter(event => !event.attendees);
+        filtered = filtered.filter(event => !event.price);
         break;
-      case 'upcoming':
+      case 'canceled':
         filtered = filtered.filter(event => new Date(event.date) > new Date());
         break;
       default:
@@ -111,15 +111,15 @@ export const HomePage: React.FC = () => {
           </div>
           <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
             <div className="text-3xl font-extrabold text-success mb-2">
-              {events.filter(e => !e.attendees).length}
+              {events.filter(e => !e.price).length}
             </div>
             <div className="text-text-soft font-medium">Free Events</div>
           </div>
           <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
             <div className="text-3xl font-extrabold text-primary mb-2">
-              {events.filter(e => new Date(e.date) > new Date()).length}
+              {events.filter(e => e.is_cancelled).length}
             </div>
-            <div className="text-text-soft font-medium">Upcoming Events</div>
+            <div className="text-text-soft font-medium">Canceled Events</div>
           </div>
         </div>
 

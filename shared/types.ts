@@ -1,7 +1,6 @@
 export interface Event {
     id: number
     id_user: number,
-    id_user: number
     title: string
     date: Date | string
     description: string
@@ -79,6 +78,7 @@ export interface JoinEventResponse {
     success: boolean
     eventUser?: EventUser
     message?: string
+    newBalance?: number
 }
 
 export interface CreateEventRequest {
@@ -103,6 +103,15 @@ export interface ChargeBalanceRequest {
 export interface ChargeBalanceResponse {
     success: boolean
     newBalance?: number
+}
+
+export interface UnJoinEventRequest {
+    eventId: number
+}
+
+export interface UnJoinEventResponse {
+    success: boolean
+    message?: string
 }
 
 export interface CancelEventRequest {
