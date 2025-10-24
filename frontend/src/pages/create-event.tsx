@@ -131,7 +131,7 @@ export const CreateEventPage: React.FC = () => {
         )}
 
         {/* Form */}
-        <div className="bg-surface border border-border rounded-lg shadow-sm p-6 md:p-8">
+        <div className=" bg-surface border hover:border-black group-focus:border-black border-border rounded-lg shadow-sm p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Título */}

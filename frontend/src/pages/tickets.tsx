@@ -11,7 +11,7 @@ const CancelTicketModal: React.FC<{
 
   return (
     <div onClick={onClose} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
+      <div  onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl p-6 w-full max-w-md">
         <div className="text-center">
           <div className="text-4xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold text-text-dark mb-2">Cancelar Entrada</h2>
@@ -135,7 +135,7 @@ const TicketsPage: React.FC = () => {
           ? 'border-red-200 bg-red-50 opacity-80' 
           : isExpired 
           ? 'border-gray-300 bg-gray-50 opacity-70' 
-          : 'border-border bg-white'
+          : 'border-border hover:border-black bg-surface-alt'
       }`}
     >
       <div className="w-28 h-20 rounded-md overflow-hidden flex-shrink-0 relative">
@@ -218,14 +218,7 @@ const TicketsPage: React.FC = () => {
             }`}>
               QR
             </div>
-            <a 
-              href={`/events/${e.id}`} 
-              className={`text-sm hover:underline ${
-                isUnavailable ? 'text-gray-400' : 'text-primary'
-              }`}
-            >
-              Ver evento
-            </a>
+            
             
             {/* Solo mostrar botón cancelar si NO está cancelado ni expirado */}
             {!isUnavailable && (

@@ -22,7 +22,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   ];
 
   return (
-    <div className="p-5 md:p-6 rounded-lg border border-border bg-surface shadow-sm mb-8">
+    <div className="p-5 md:p-6 rounded-lg border-border bg-surface shadow-sm mb-8 border hover:border-black">
       <div className="flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 w-full">
           <div className="relative">

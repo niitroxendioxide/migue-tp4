@@ -28,6 +28,9 @@ export async function getAllEvents() {
         price: true,
         location: true,
         image_url: true,
+    },
+    orderBy: {
+      date: 'desc',
     }
   })
 

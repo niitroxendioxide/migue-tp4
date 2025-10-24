@@ -28,7 +28,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
 
   return (
     <div
-      className={`group relative rounded-xl border border-border bg-surface shadow-sm hover:shadow-md hover:border-border transition-all duration-300 overflow-hidden flex flex-col ${(event.is_cancelled || new Date(event.date) < new Date()) ? 'opacity-70 grayscale' : ''}`}
+      className={`group relative rounded-xl border hover:border-black border-border bg-surface shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col ${(event.is_cancelled || new Date(event.date) < new Date()) ? 'opacity-70 grayscale' : ''}`}
     >
       {/* Media */}
       <div className="relative h-44 overflow-hidden">

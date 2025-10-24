@@ -108,23 +108,23 @@ export const HomePage: React.FC = () => {
 
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
+          <div className="p-6 rounded-lg shadow-sm text-center border hover:border-black border-border bg-surface">
             <div className="text-3xl font-extrabold text-primary mb-2">{events.length}</div>
             <div className="text-text-soft font-medium">Total Events</div>
           </div>
-          <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
+          <div className="p-6 rounded-lg shadow-sm text-center border hover:border-black border-border bg-surface">
             <div className="text-3xl font-extrabold text-success mb-2">
               {events.filter(e => !e.price).length}
             </div>
             <div className="text-text-soft font-medium">Free Events</div>
           </div>
-          <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
+          <div className="p-6 rounded-lg shadow-sm text-center border hover:border-black border-border bg-surface">
             <div className="text-3xl font-extrabold text-primary mb-2">
               {events.filter(e => e.is_cancelled).length}
             </div>
             <div className="text-text-soft font-medium">Canceled Events</div>
           </div>
-          <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
+          <div className="p-6 rounded-lg shadow-sm text-center  border hover:border-black border-border bg-surface">
             <div className="text-3xl font-extrabold text-primary mb-2">
               {events.filter(e => new Date(e.date) < new Date()).length}
             </div>

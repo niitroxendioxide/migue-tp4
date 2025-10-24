@@ -25,7 +25,7 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
 
   return (
     <div onClick={onCancel} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
+      <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl p-6 w-full max-w-md">
         <div className="text-center">
           <div className="text-4xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold text-text-dark mb-2">Cancelar Evento</h2>
@@ -116,7 +116,7 @@ const ProfilePage: React.FC = () => {
     <Layout>
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header del perfil */}
-        <div className="bg-gradient-to-r from-primary to-primary/80 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-r border hover:border-black from-primary to-primary/80 rounded-xl p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold mb-2">Mi Perfil</h1>
@@ -134,9 +134,9 @@ const ProfilePage: React.FC = () => {
 
         {/* Estadísticas rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="bg-surface-alt/45 p-4 rounded-lg border hover:border-black border-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2 bg-blue-100 border border-gray-400 rounded-lg">
                 <span className="text-blue-600">🎭</span>
               </div>
               <div>
@@ -147,13 +147,13 @@ const ProfilePage: React.FC = () => {
           </div>
 
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <div className="bg-surface-alt/45 p-4 rounded-lg border hover:border-black border-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
+              <div className="p-2 bg-purple-100 border border-gray-400 rounded-lg">
                 <span className="text-purple-600">👥</span>
               </div>
               <div>
-                <p className="text-text-muted text-sm">Total Asistentes</p>
+                <p className="text-text-muted text-sm ">Total Asistentes</p>
                 <p className="font-bold text-lg">
                   {createdEvents.reduce((sum, event) => sum + (event.attendees || 0), 0)}
                 </p>
@@ -161,11 +161,37 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
+          <div className="bg-surface-alt/45 p-4 rounded-lg border hover:border-black border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gray-100 border border-gray-400 rounded-lg">
+                <span className="text-purple-600">❌</span>
+              </div>
+              <div>
+                <p className="text-text-muted text-sm ">Eventos Cancelados</p>
+                <p className="font-bold text-lg">
+                  {createdEvents.reduce((sum, event) => sum + (event.is_cancelled ? 1 : 0), 0)}
+                </p>
+              </div>
+            </div>
+          </div>
 
+          <div className="bg-surface-alt/45 p-4 rounded-lg border hover:border-black border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gray-100 border border-gray-400 rounded-lg">
+                <span className="text-purple-600">⏳</span>
+              </div>
+              <div>
+                <p className="text-text-muted text-sm ">Eventos Expirados</p>
+                <p className="font-bold text-lg">
+                  {createdEvents.reduce((sum, event) => sum + (new Date(event.date) < new Date() ? 1 : 0), 0)}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Gestión de eventos creados */}
-        <div className="bg-white rounded-lg border border-gray-200">
+        <div className="bg-surface-alt rounded-lg border border-border">
           <div className="p-6 border-b border-gray-200">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-text-dark">Mis Eventos</h2>
@@ -197,19 +223,19 @@ const ProfilePage: React.FC = () => {
                   return (
                     <div
                       key={event.id}
-                      className={`border rounded-lg p-4 transition-all hover:shadow-md ${isUnavailable
-                          ? 'border-gray-300 bg-gray-50 opacity-75'
-                          : 'border-gray-200 bg-white'
+                      className={`border rounded-lg p-4 transition-all hover:border-black hover:shadow-md ${isUnavailable
+                        ? 'border-border bg-surface'
+                        : 'border-border bg-surface'
                         } ${event.is_cancelled ? 'border-red-200 bg-red-50' : ''}`}
                     >
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className={`text-lg font-semibold ${event.is_cancelled
-                                ? 'text-red-600'
-                                : isExpired
-                                  ? 'text-gray-500'
-                                  : 'text-text-dark'
+                              ? 'text-red-600'
+                              : isExpired
+                                ? 'text-gray-500'
+                                : 'text-text-dark'
                               }`}>
                               {event.title}
                             </h3>

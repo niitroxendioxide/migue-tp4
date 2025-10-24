@@ -29,8 +29,8 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
       return;
     }
 
-    if (numAmount > 1000) {
-      setError('El monto máximo por recarga es $1000');
+    if (numAmount > 100000) {
+      setError('El monto máximo por recarga es $100000');
       return;
     }
 
@@ -51,7 +51,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
 
   return (
     <div onClick={() => onClose()} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
+      <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl p-6 w-full max-w-md ">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-text-dark">Recargar Saldo</h2>
           <button
@@ -74,7 +74,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
               min="1"
-              max="1000"
+              max="10000000"
               step="0.01"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-lg"
               disabled={loading}
@@ -88,7 +88,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
                 <button
                   key={preset}
                   type="button"
-                  onClick={() => chargeAmount(preset)}
+                  onClick={() => setAmount(preset.toString())}
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 focus:ring-2 focus:ring-primary focus:border-primary"
                   disabled={loading}
                 >
@@ -123,7 +123,6 @@ const TopUpModal: React.FC<TopUpModalProps> = ({ isOpen, onClose, onSuccess }) =
               type="submit"
               className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading || !amount}
-              onClick={() => chargeAmount(parseFloat(amount))}
             >
               {loading ? 'Procesando...' : 'Recargar'}
             </button>
@@ -149,7 +148,7 @@ const WalletPage: React.FC = () => {
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Encabezado de billetera */}
-        <div className="bg-gradient-to-r from-primary to-primary/80 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-r border hover:border-black from-primary to-primary/80 rounded-xl p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold mb-2">Mi Billetera</h1>

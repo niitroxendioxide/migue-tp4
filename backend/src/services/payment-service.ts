@@ -3,6 +3,9 @@ import { ServerError, ValidationError } from "../middleware/errors";
 import { ChargeBalanceResponse } from "../../../shared/types";
 
 export async function chargeBalance(p_UserId: number, p_Amount: number): Promise<ChargeBalanceResponse> {
+    if (p_Amount >= 1000000) {
+        throw new ValidationError("El monto máximo por recarga es $1000000");
+    }
     const user = await db.user.findUnique({
         where: {
             id: p_UserId,
