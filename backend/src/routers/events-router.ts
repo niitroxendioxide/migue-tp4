@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { CancelEventRequest, CreateEventRequest, JoinEventRequest } from '../../../shared/types'
 import { getAllEvents, createEvent, joinEvent, getEventById, getCreatedEvents, cancelEvent, getJoinedEvents } from '../services/event-service'
 import { authMiddleware } from '../middleware/auth'
-import { ServerError } from '../middleware/errors'
+import { BadRequestError, ServerError } from '../middleware/errors'
 
 export const eventsRouter = Router()
 
@@ -43,7 +43,7 @@ eventsRouter.post('/join', authMiddleware, async (req, res, next) => {
         const body = req.body as JoinEventRequest;
         console.log("Join event req: ", body);
         if (!body.eventId) {
-            throw new ServerError('Malformed JSON: Event id is required');
+            throw new BadRequestError('Malformed JSON: Event id is required');
         }
 
         const response = await joinEvent(body.eventId, req.user.id);

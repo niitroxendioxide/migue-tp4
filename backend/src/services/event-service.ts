@@ -235,6 +235,9 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
     }
   })
 
+  if (event.price > user.balance) {
+    throw new BadRequestError('Insufficient balance to join event');
+  }
   const updateBalanceResult = await db.user.update({
     data: {
       balance: user.balance - event.price,
