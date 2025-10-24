@@ -111,44 +111,146 @@ const TicketsPage: React.FC = () => {
         ) : (
           <div className="grid gap-4">
             {joinedEvents.map((joined, idx) => {
-              const e = (joined as any).event || joined;
-              const dateObj = new Date(e.date);
-              const dateStr = dateObj.toLocaleString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-              const priceLabel = !e.price ? 'Gratis' : `$${(e.price ?? 0).toFixed(2)}`;
+  const e = (joined as any).event || joined;
+  const dateObj = new Date(e.date);
+  const dateStr = dateObj.toLocaleString('es-ES', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+  const priceLabel = !e.price ? 'Gratis' : `$${(e.price ?? 0).toFixed(2)}`;
+  
+  // Verificar si está expirado o cancelado
+  const isExpired = new Date(e.date) < new Date();
+  const isCancelled = e.is_cancelled;
+  const isUnavailable = isCancelled || isExpired;
 
-              return (
-                <div key={e.id ?? idx} className="flex items-center gap-4 border border-border rounded-lg p-4 bg-white shadow-sm">
-                  <div className="w-28 h-20 rounded-md overflow-hidden flex-shrink-0">
-                    <img src={e.image_url || '/placeholder-event.jpg'} alt={e.title} className="w-full h-full object-cover" />
-                  </div>
+  return (
+    <div 
+      key={e.id ?? idx} 
+      className={`flex items-center gap-4 border rounded-lg p-4 shadow-sm transition-all ${
+        isCancelled 
+          ? 'border-red-200 bg-red-50 opacity-80' 
+          : isExpired 
+          ? 'border-gray-300 bg-gray-50 opacity-70' 
+          : 'border-border bg-white'
+      }`}
+    >
+      <div className="w-28 h-20 rounded-md overflow-hidden flex-shrink-0 relative">
+        <img 
+          src={e.image_url || '/placeholder-event.jpg'} 
+          alt={e.title} 
+          className={`w-full h-full object-cover ${isUnavailable ? 'grayscale' : ''}`}
+        />
+        {isCancelled && (
+          <div className="absolute inset-0 bg-red-600/20 flex items-center justify-center">
+            <span className="text-xs font-bold text-red-700 bg-white/90 px-2 py-1 rounded">
+              CANCELADO
+            </span>
+          </div>
+        )}
+        {isExpired && !isCancelled && (
+          <div className="absolute inset-0 bg-gray-600/20 flex items-center justify-center">
+            <span className="text-xs font-bold text-gray-700 bg-white/90 px-2 py-1 rounded">
+              EXPIRADO
+            </span>
+          </div>
+        )}
+      </div>
 
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start gap-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-text-base">{e.title}</h3>
-                        <p className="text-sm text-text-muted">{dateStr} • {e.location}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-text-muted">Precio</p>
-                        <p className="text-lg font-bold">{priceLabel}</p>
-                      </div>
-                    </div>
+      <div className="flex-1">
+        <div className="flex justify-between items-start gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className={`text-lg font-semibold ${
+                isCancelled 
+                  ? 'text-red-600 line-through' 
+                  : isExpired 
+                  ? 'text-gray-500' 
+                  : 'text-text-base'
+              }`}>
+                {e.title}
+              </h3>
+              {isCancelled && (
+                <span className="px-2 py-0.5 bg-red-200 text-red-800 text-xs rounded-full font-medium">
+                  CANCELADO
+                </span>
+              )}
+              {isExpired && !isCancelled && (
+                <span className="px-2 py-0.5 bg-gray-200 text-gray-700 text-xs rounded-full font-medium">
+                  EXPIRADO
+                </span>
+              )}
+            </div>
+            <p className={`text-sm ${
+              isUnavailable ? 'text-gray-400' : 'text-text-muted'
+            }`}>
+              {dateStr} • {e.location}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className={`text-sm ${isUnavailable ? 'text-gray-400' : 'text-text-muted'}`}>
+              Precio
+            </p>
+            <p className={`text-lg font-bold ${
+              isCancelled 
+                ? 'text-red-600 line-through' 
+                : isExpired 
+                ? 'text-gray-500' 
+                : 'text-text-base'
+            }`}>
+              {priceLabel}
+            </p>
+          </div>
+        </div>
 
-                    <div className="mt-3 flex items-center justify-between">
-                      <div className="text-xs text-text-muted">
-                        Código: <span className="font-mono">TICKET-{('000000' + String(e.id)).slice(-6)}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-md bg-surface flex items-center justify-center text-xs text-text-muted">QR</div>
-                        <a href={`/events/${e.id}`} className="text-sm text-primary hover:underline">Ver evento</a>
-                        <button onClick={() => setCancelTicketId(e.id)} className="text-sm text-red-500 hover:text-red-300"><X /></button>
-                      </div>
-                      
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+        <div className="mt-3 flex items-center justify-between">
+          <div className={`text-xs ${isUnavailable ? 'text-gray-400' : 'text-text-muted'}`}>
+            Código: <span className="font-mono">TICKET-{('000000' + String(e.id)).slice(-6)}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className={`w-12 h-12 rounded-md flex items-center justify-center text-xs ${
+              isUnavailable 
+                ? 'bg-gray-200 text-gray-400' 
+                : 'bg-surface text-text-muted'
+            }`}>
+              QR
+            </div>
+            <a 
+              href={`/events/${e.id}`} 
+              className={`text-sm hover:underline ${
+                isUnavailable ? 'text-gray-400' : 'text-primary'
+              }`}
+            >
+              Ver evento
+            </a>
+            
+            {/* Solo mostrar botón cancelar si NO está cancelado ni expirado */}
+            {!isUnavailable && (
+              <button 
+                onClick={() => setCancelTicketId(e.id)} 
+                className="text-sm text-red-500 hover:text-red-300"
+              >
+                <X />
+              </button>
+            )}
+            
+            {/* Mostrar mensaje si está cancelado/expirado */}
+            {isUnavailable && (
+              <span className={`text-xs font-medium ${
+                isCancelled ? 'text-red-600' : 'text-gray-500'
+              }`}>
+                {isCancelled ? 'No disponible' : 'Finalizado'}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+})}
           </div>
         )}
       </div>

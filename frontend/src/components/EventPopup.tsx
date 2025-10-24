@@ -131,7 +131,7 @@ export const EventPopup: React.FC<EventPopupProps> = ({
                 {/* Content */}
                 <div className="p-6 space-y-4">
                     {image_url && (
-                        <div className="w-full h-64 rounded-lg overflow-hidden" style={{ border: '1px solid var(--color-border)' }}>
+                        <div className="w-full h-128 rounded-lg overflow-hidden" style={{ border: '1px solid var(--color-border)' }}>
                             <img
                                 src={image_url}
                                 alt={title}

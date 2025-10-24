@@ -28,7 +28,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
 
   return (
     <div
-      className={`group relative rounded-xl border border-border bg-surface shadow-sm hover:shadow-md hover:border-border transition-all duration-300 overflow-hidden flex flex-col ${event.is_cancelled ? 'opacity-70 grayscale' : ''}`}
+      className={`group relative rounded-xl border border-border bg-surface shadow-sm hover:shadow-md hover:border-border transition-all duration-300 overflow-hidden flex flex-col ${(event.is_cancelled || new Date(event.date) < new Date()) ? 'opacity-70 grayscale' : ''}`}
     >
       {/* Media */}
       <div className="relative h-44 overflow-hidden">
@@ -38,7 +38,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
           loading="lazy"
         />
-  <div className="absolute inset-0 bg-black/30 mix-blend-multiply pointer-events-none" />
+        <div className="absolute inset-0 bg-black/30 mix-blend-multiply pointer-events-none" />
 
         {/* Top badges */}
         <div className="absolute top-2 left-2 flex flex-wrap gap-2">
@@ -58,6 +58,12 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
             Cancelled
           </div>
         )}
+        {new Date(event.date) < new Date() && (
+          <div className="absolute top-2 right-2 px-2 py-1 rounded-md text-[11px] font-semibold bg-red-600 text-text-inverse shadow border border-red-500/70">
+            Expired
+          </div>
+        )}
+
 
         {/* Title overlay (optional) */}
         <div className="absolute bottom-2 left-2 right-2">
@@ -68,8 +74,8 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
       </div>
 
       {/* Body */}
-  <div className="p-5 flex flex-col flex-1 bg-surface">
-  <p className="text-xs text-text-muted mb-1">{fullDate}</p>
+      <div className="p-5 flex flex-col flex-1 bg-surface">
+        <p className="text-xs text-text-muted mb-1">{fullDate}</p>
         <p className="text-text-muted text-sm line-clamp-2 mb-4 flex-1 leading-relaxed">{event.description}</p>
 
         <div className="flex items-start gap-2 text-xs text-text-muted mb-4">
@@ -80,17 +86,20 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onJoinEvent }) => {
           <span className="line-clamp-1" title={event.location}>{event.location}</span>
         </div>
 
-        {!event.is_cancelled && onJoinEvent && (
+        {((!event.is_cancelled && new Date(event.date) >= new Date()) && onJoinEvent) && (
           <button
             onClick={() => onJoinEvent(event)}
             className={`cursor-pointer w-full mt-auto inline-flex justify-center items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold tracking-wide shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 transition-all
-              ${isFree ? 'bg-success hover:bg-success-hover text-text-inverse focus-visible:ring-success' : 'bg-primary hover:bg-primary-hover text-text-inverse focus-visible:ring-primary'}`}
+      ${isFree ? 'bg-success hover:bg-success-hover text-text-inverse focus-visible:ring-success' : 'bg-primary hover:bg-primary-hover text-text-inverse focus-visible:ring-primary'}`}
           >
             {isFree ? "0$" : priceLabel}
           </button>
         )}
         {event.is_cancelled && (
           <div className="mt-auto text-xs font-medium text-text-danger">This event was cancelled</div>
+        )}
+        {new Date(event.date) < new Date() && (
+          <div className="mt-auto text-xs font-medium text-text-danger">This event has expired</div>
         )}
       </div>
     </div>

@@ -160,6 +160,14 @@ export async function createEvent(p_EventRequest: CreateEventRequest & { userId:
     throw new BadRequestError('Price is required');
   }
 
+  if (new Date(p_EventRequest.date) < new Date()) {
+    throw new BadRequestError('Event date must be in the future');
+  }
+
+  if (p_EventRequest.price < 0) {
+    throw new BadRequestError('Price cannot be negative');
+  }
+
   const event = await db.event.create({
     data: {
       id_user: p_EventRequest.userId,
@@ -199,6 +207,9 @@ export async function joinEvent(p_EventId: number, p_UserId: number): Promise<Jo
 
   if (!event) {
     throw new BadRequestError('Event not found');
+  }
+  if (event.date < new Date()) {
+    throw new BadRequestError('Cannot join expired event');
   }
 
   const user = await db.user.findUnique({
@@ -336,9 +347,20 @@ export async function unJoinEvent(p_EventId: number, p_UserId: number): Promise<
   if (!removeEventUserResult) {
     throw new ServerError('Error cancelling event');
   }
+  const user = await db.user.update({
+    where: {
+      id: p_UserId,
+    },
+    data: {
+      balance: {
+        increment: event.price,
+      }
+    }
+  })
 
   return {
     success: true,
     message: 'Event unjoined successfully',
+    newBalance: user.balance,
   }
 }

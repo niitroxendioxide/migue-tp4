@@ -306,8 +306,9 @@ export const useEventUnjoin = () => {
         const errorMessage = errorData.message || errorData.error || response.statusText;
         throw new Error(errorMessage);
       }
-
-      return await response.json();
+      const data = await response.json();
+      useAuthStore.getState().updateBalance(data.newBalance);
+      return data;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);

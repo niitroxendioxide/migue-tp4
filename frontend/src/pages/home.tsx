@@ -46,6 +46,9 @@ export const HomePage: React.FC = () => {
       case 'canceled':
         filtered = filtered.filter(event => new Date(event.date) > new Date());
         break;
+      case "expired":
+        filtered = filtered.filter(event => new Date(event.date) < new Date());
+        break;
       default:
         break;
     }
@@ -104,7 +107,7 @@ export const HomePage: React.FC = () => {
         />
 
         {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
             <div className="text-3xl font-extrabold text-primary mb-2">{events.length}</div>
             <div className="text-text-soft font-medium">Total Events</div>
@@ -120,6 +123,12 @@ export const HomePage: React.FC = () => {
               {events.filter(e => e.is_cancelled).length}
             </div>
             <div className="text-text-soft font-medium">Canceled Events</div>
+          </div>
+          <div className="p-6 rounded-lg shadow-sm text-center border-border bg-surface">
+            <div className="text-3xl font-extrabold text-primary mb-2">
+              {events.filter(e => new Date(e.date) < new Date()).length}
+            </div>
+            <div className="text-text-soft font-medium">Expired Events</div>
           </div>
         </div>
 

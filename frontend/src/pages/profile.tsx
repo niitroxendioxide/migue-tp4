@@ -64,7 +64,7 @@ const ProfilePage: React.FC = () => {
   const user = useAuthStore.getState().user;
   const isAuthenticated = useAuthStore.getState().isAuthenticated;
   const balance = useAuthStore.getState().user?.balance ?? 0;
-  const {cancelEvent, loading: loadingCancel, error: errorCancel} = useEventCancellation();
+  const { cancelEvent, loading: loadingCancel, error: errorCancel } = useEventCancellation();
   const { createdEvents, loading, error, fetchCreatedEvents } = useCreatedEvents(); // Placeholder, replace with actual data fetching if needed
   const [cancelModal, setCancelModal] = useState<{ isOpen: boolean; eventId: number; eventTitle: string }>({
     isOpen: false,
@@ -110,65 +110,6 @@ const ProfilePage: React.FC = () => {
     });
   };
 
-  const renderEventCard = (event: any, showCancelButton = false) => (
-    <div
-      key={event.id}
-      className={`bg-white rounded-lg border ${event.is_cancelled ? 'border-red-200 bg-red-50' : 'border-gray-200'} p-6 hover:shadow-md transition-shadow`}
-    >
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className={`text-lg font-bold ${event.is_cancelled ? 'text-red-600' : 'text-text-dark'}`}>
-              {event.title}
-            </h3>
-            {event.is_cancelled && (
-              <span className="px-2 py-1 bg-red-200 text-red-800 text-xs rounded-full">
-                CANCELADO
-              </span>
-            )}
-          </div>
-          <p className="text-text-muted text-sm mb-2">{formatDate(event.date)}</p>
-          <p className="text-text-muted text-sm mb-2">📍 {event.location}</p>
-          {event.description && (
-            <p className="text-text-base text-sm mb-3">{event.description}</p>
-          )}
-        </div>
-        {event.image_url && (
-          <div className="w-20 h-20 rounded-lg overflow-hidden ml-4">
-            <img
-              src={event.image_url}
-              alt={event.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4 text-sm text-text-muted">
-          <span>👥 {event.attendees || 0} asistentes</span>
-          {event.is_paid ? (
-            <span>💰 ${event.price?.toFixed(2) || '0.00'}</span>
-          ) : (
-            <span>🎟️ Gratis</span>
-          )}
-        </div>
-
-        {showCancelButton && !event.is_cancelled && (
-          <button
-            onClick={() => setCancelModal({
-              isOpen: true,
-              eventId: event.id,
-              eventTitle: event.title
-            })}
-            className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Cancelar Evento
-          </button>
-        )}
-      </div>
-    </div>
-  );
 
 
   return (
@@ -249,59 +190,83 @@ const ProfilePage: React.FC = () => {
               <p className="text-text-muted mt-4">No has creado ningún evento aún.</p>
             ) : (
               <div className="space-y-4 mt-4">
-                {createdEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    className={`border rounded-lg p-4 transition-all hover:shadow-md ${event.is_cancelled ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'
-                      }`}
-                  >
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className={`text-lg font-semibold ${event.is_cancelled ? 'text-red-600' : 'text-text-dark'
-                            }`}>
-                            {event.title}
-                          </h3>
-                          {event.is_cancelled && (
-                            <span className="px-2 py-1 bg-red-200 text-red-800 text-xs rounded-full font-medium">
-                              CANCELADO
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-text-muted mb-1">
-                          📅 {new Date(event.date).toLocaleDateString('es-ES', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
-                        </p>
-                        <p className="text-sm text-text-muted mb-2">📍 {event.location}</p>
-                        <div className="flex items-center gap-4 text-sm text-text-muted">
-                          <span>👥 {event.attendees || 0} asistentes</span>
-                          {event.price ? (
-                            <span>💰 ${event.price?.toFixed(2) || '0.00'}</span>
-                          ) : (
-                            <span>🎟️ Gratis</span>
-                          )}
-                        </div>
-                      </div>
+                {createdEvents.map((event) => {
+                  const isExpired = new Date(event.date) < new Date();
+                  const isUnavailable = event.is_cancelled || isExpired;
 
-                      {!event.is_cancelled && (
-                        <button
-                          onClick={() => setCancelModal({
-                            isOpen: true,
-                            eventId: event.id,
-                            eventTitle: event.title
-                          })}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Cancelar evento"
-                        >
-                          <X className="h-5 w-5" />
-                        </button>
-                      )}
+                  return (
+                    <div
+                      key={event.id}
+                      className={`border rounded-lg p-4 transition-all hover:shadow-md ${isUnavailable
+                          ? 'border-gray-300 bg-gray-50 opacity-75'
+                          : 'border-gray-200 bg-white'
+                        } ${event.is_cancelled ? 'border-red-200 bg-red-50' : ''}`}
+                    >
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className={`text-lg font-semibold ${event.is_cancelled
+                                ? 'text-red-600'
+                                : isExpired
+                                  ? 'text-gray-500'
+                                  : 'text-text-dark'
+                              }`}>
+                              {event.title}
+                            </h3>
+
+                            {event.is_cancelled && (
+                              <span className="px-2 py-1 bg-red-200 text-red-800 text-xs rounded-full font-medium">
+                                CANCELADO
+                              </span>
+                            )}
+
+                            {isExpired && !event.is_cancelled && (
+                              <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full font-medium">
+                                EXPIRADO
+                              </span>
+                            )}
+                          </div>
+
+                          <p className={`text-sm mb-1 ${isExpired ? 'text-gray-400' : 'text-text-muted'}`}>
+                            📅 {new Date(event.date).toLocaleDateString('es-ES', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })}
+                          </p>
+
+                          <p className={`text-sm mb-2 ${isExpired ? 'text-gray-400' : 'text-text-muted'}`}>
+                            📍 {event.location}
+                          </p>
+
+                          <div className={`flex items-center gap-4 text-sm ${isExpired ? 'text-gray-400' : 'text-text-muted'}`}>
+                            <span>👥 {event.attendees || 0} asistentes</span>
+                            {event.price ? (
+                              <span>💰 ${event.price?.toFixed(2) || '0.00'}</span>
+                            ) : (
+                              <span>🎟️ Gratis</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Solo mostrar botón de cancelar si NO está cancelado Y NO está expirado */}
+                        {!isUnavailable && (
+                          <button
+                            onClick={() => setCancelModal({
+                              isOpen: true,
+                              eventId: event.id,
+                              eventTitle: event.title
+                            })}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Cancelar evento"
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

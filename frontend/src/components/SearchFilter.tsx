@@ -17,7 +17,8 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
     { value: 'all', label: 'All Events' },
     { value: 'paid', label: 'Paid Events' },
     { value: 'free', label: 'Free Events' },
-    { value: 'canceled', label: 'Canceled Events' }
+    { value: 'canceled', label: 'Canceled Events' },
+    { value: "expired", label: "Expired Events" }
   ];
 
   return (

@@ -112,6 +112,7 @@ export interface UnJoinEventRequest {
 export interface UnJoinEventResponse {
     success: boolean
     message?: string
+    newBalance?: number
 }
 
 export interface CancelEventRequest {
