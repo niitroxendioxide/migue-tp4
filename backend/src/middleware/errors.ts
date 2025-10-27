@@ -34,11 +34,7 @@ export const errorHandlerMiddleware = (
     res: any, 
     next: any
 ) => {
-    console.log('Error:', err); // Para debugging
-
     // Si es un error personalizado (ServerError)
-    console.log("error message:", err.message);
-    console.log("error name:", err.name);
     if (err instanceof ServerError) {
         return res.status(err.statusCode).json({ 
             message: err.message,
@@ -46,7 +42,6 @@ export const errorHandlerMiddleware = (
         });
     }
 
-    // Si es un error genérico
     return res.status(500).json({ 
         message: err.message || 'Internal server error',
         error: 'ServerError'

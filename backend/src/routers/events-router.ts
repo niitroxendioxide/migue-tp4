@@ -83,7 +83,6 @@ eventsRouter.post("/cancel", authMiddleware, async (req, res, next) => {
         if (!body.eventId) {
             throw new BadRequestError('Malformed JSON: Event id is required');
         }
-        console.log("Cancel event req: ", body);
 
         const response = await cancelEvent(body.eventId, req.user.id);
         res.status(200).json(response);
